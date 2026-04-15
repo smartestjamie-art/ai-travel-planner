@@ -1,11 +1,21 @@
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 import httpx
 
-from app.config import AMAP_API_KEY, AMAP_BASE_URL, AMAP_TIMEOUT_SECONDS
+from app.config import (
+    AMAP_API_KEY,
+    AMAP_BASE_URL,
+    AMAP_TIMEOUT_SECONDS,
+    REDIS_WEATHER_TTL_SECONDS,
+)
+from app.services.cache_service import get_cached_json, set_cached_json
 from app.services.map_service import geocode_address
+
+
+logger = logging.getLogger(__name__)
 
 
 def _ensure_amap_api_key() -> None:
@@ -40,8 +50,22 @@ def _request_amap_weather(path: str, params: dict[str, Any]) -> dict[str, Any]:
     return payload
 
 
+def _normalize_cache_text(value: str | None) -> str:
+    """把缓存 key 里用到的文本做简单标准化。"""
+    if value is None:
+        return ""
+    return value.strip().lower()
+
+
 def get_weather_forecast(city: str) -> dict[str, Any]:
     """获取指定城市的未来天气预报。"""
+    cache_key = f"weather:forecast:{_normalize_cache_text(city)}"
+    cached_value = get_cached_json(cache_key)
+    if cached_value is not None:
+        logger.info("weather cache hit: city=%s", city)
+        return cached_value
+    logger.info("weather cache miss: city=%s", city)
+
     geocode = geocode_address(city, city=city)
     city_code = geocode.get("adcode") if geocode is not None else city
 
@@ -74,10 +98,12 @@ def get_weather_forecast(city: str) -> dict[str, Any]:
         for cast in casts
     ]
 
-    return {
+    result = {
         "city": first.get("city") or city,
         "province": first.get("province"),
         "adcode": first.get("adcode"),
         "report_time": first.get("reporttime"),
         "days": days,
     }
+    set_cached_json(cache_key, result, expire_seconds=REDIS_WEATHER_TTL_SECONDS)
+    return result

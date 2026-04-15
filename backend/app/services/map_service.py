@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 import httpx
@@ -9,8 +10,13 @@ from app.config import (
     AMAP_BASE_URL,
     AMAP_DEFAULT_CITY,
     AMAP_TIMEOUT_SECONDS,
+    REDIS_MAP_TTL_SECONDS,
 )
 from app.models.schemas import HotelItem, Itinerary, SpotItem, TransportItem
+from app.services.cache_service import get_cached_json, set_cached_json
+
+
+logger = logging.getLogger(__name__)
 
 
 def _ensure_amap_api_key() -> None:
@@ -64,8 +70,24 @@ def _split_location(location: str | None) -> tuple[float | None, float | None]:
     return _parse_float(latitude_text), _parse_float(longitude_text)
 
 
+def _normalize_cache_text(value: str | None) -> str:
+    """把缓存 key 里用到的文本做简单标准化。"""
+    if value is None:
+        return ""
+    return value.strip().lower()
+
+
 def geocode_address(address: str, city: str | None = None) -> dict[str, Any] | None:
     """根据地址获取经纬度信息。"""
+    cache_key = (
+        f"map:geocode:{_normalize_cache_text(address)}:{_normalize_cache_text(city or AMAP_DEFAULT_CITY)}"
+    )
+    cached_value = get_cached_json(cache_key)
+    if cached_value is not None:
+        logger.info("map geocode cache hit: address=%s city=%s", address, city or AMAP_DEFAULT_CITY)
+        return cached_value
+    logger.info("map geocode cache miss: address=%s city=%s", address, city or AMAP_DEFAULT_CITY)
+
     payload = _request_amap(
         "/geocode/geo",
         {
@@ -80,7 +102,7 @@ def geocode_address(address: str, city: str | None = None) -> dict[str, Any] | N
 
     first = geocodes[0]
     latitude, longitude = _split_location(first.get("location"))
-    return {
+    result = {
         "formatted_address": first.get("formatted_address", address),
         "province": first.get("province"),
         "city": first.get("city"),
@@ -89,6 +111,8 @@ def geocode_address(address: str, city: str | None = None) -> dict[str, Any] | N
         "latitude": latitude,
         "longitude": longitude,
     }
+    set_cached_json(cache_key, result, expire_seconds=REDIS_MAP_TTL_SECONDS)
+    return result
 
 
 def search_places(
@@ -97,6 +121,15 @@ def search_places(
     page_size: int = 5,
 ) -> list[dict[str, Any]]:
     """根据关键词搜索 POI。"""
+    cache_key = (
+        f"map:place:{_normalize_cache_text(keyword)}:{_normalize_cache_text(city or AMAP_DEFAULT_CITY)}:{page_size}"
+    )
+    cached_value = get_cached_json(cache_key)
+    if cached_value is not None:
+        logger.info("map place cache hit: keyword=%s city=%s", keyword, city or AMAP_DEFAULT_CITY)
+        return cached_value
+    logger.info("map place cache miss: keyword=%s city=%s", keyword, city or AMAP_DEFAULT_CITY)
+
     payload = _request_amap(
         "/place/text",
         {
@@ -128,6 +161,7 @@ def search_places(
             }
         )
 
+    set_cached_json(cache_key, results, expire_seconds=REDIS_MAP_TTL_SECONDS)
     return results
 
 
@@ -138,6 +172,29 @@ def estimate_route(
     destination_latitude: float,
 ) -> dict[str, Any] | None:
     """估算两点之间的驾车距离和耗时。"""
+    cache_key = (
+        "map:route:"
+        f"{origin_longitude:.6f},{origin_latitude:.6f}:"
+        f"{destination_longitude:.6f},{destination_latitude:.6f}"
+    )
+    cached_value = get_cached_json(cache_key)
+    if cached_value is not None:
+        logger.info(
+            "map route cache hit: origin=%s,%s destination=%s,%s",
+            origin_longitude,
+            origin_latitude,
+            destination_longitude,
+            destination_latitude,
+        )
+        return cached_value
+    logger.info(
+        "map route cache miss: origin=%s,%s destination=%s,%s",
+        origin_longitude,
+        origin_latitude,
+        destination_longitude,
+        destination_latitude,
+    )
+
     payload = _request_amap(
         "/direction/driving",
         {
@@ -156,13 +213,15 @@ def estimate_route(
     distance_meters = _parse_float(first_path.get("distance"))
     duration_seconds = _parse_float(first_path.get("duration"))
 
-    return {
+    result = {
         "distance_meters": distance_meters,
         "distance_km": round(distance_meters / 1000, 2) if distance_meters is not None else None,
         "duration_seconds": duration_seconds,
         "estimated_minutes": round(duration_seconds / 60) if duration_seconds is not None else None,
         "taxi_cost": _parse_float(route.get("taxi_cost")),
     }
+    set_cached_json(cache_key, result, expire_seconds=REDIS_MAP_TTL_SECONDS)
+    return result
 
 
 def _pick_best_place(keyword: str, city: str | None = None) -> dict[str, Any] | None:
