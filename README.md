@@ -2,13 +2,14 @@
 
 > 融合大模型、RAG、本地攻略与高德地图能力的智能旅行规划系统
 
-智旅云图是一个面向中文旅行场景的 AI 旅行规划项目。用户输入目的地、日期、预算、人数和偏好后，系统会生成结构化 itinerary，并进一步补充地图点位、天气信息、预算拆分、景点图片与可导出的旅行文档。
+智旅云图是一个面向中文旅行场景的 AI 旅行规划项目。用户输入目的地、日期、预算、人数和偏好后，系统会自动生成结构化旅行方案，并进一步补充地图点位、天气信息、预算拆分、景点图片与可导出的旅行文档。
 
-相比只输出文本的 LLM Demo，这个项目更强调完整链路落地：从 **行程生成、攻略检索、地图 enrich、天气补充，到历史管理与文档导出**，尽量把 AI 能力组织成一个可交互、可保存、可展示的产品原型。
+相比只输出一段文本的 LLM Demo，这个项目更强调完整链路落地：从 **行程生成、攻略检索、地图信息补全、天气补充，到历史管理与文档导出**，尽量把 AI 能力组织成一个可交互、可保存、可展示的产品原型。
 
 ## 📝 最近更新
 
 - `2026-04-15`：新增 Redis 缓存层，已覆盖天气查询、地图查询与 RAG 检索结果缓存。
+- `2026-04-25`：完成第一轮 RAG 在线阶段优化，已接入轻量化 Query Rewrite、轻量 Rerank 与检索调试脚本。
 
 更多更新见：[CHANGELOG.md](./CHANGELOG.md)
 
@@ -39,6 +40,7 @@
 
 - 🧠 **LLM 行程生成**：基于 LangChain + DashScope 调用 `qwen-max` 生成结构化旅行计划
 - 📚 **RAG 攻略增强**：使用本地 Markdown 攻略 + Chroma 向量检索，为生成结果补充目的地上下文
+- 🧭 **RAG 在线优化**：已完成第一版轻量化 Query Rewrite 与轻量 Rerank，提升旅行规划类需求下的召回排序质量
 - 🗺️ **高德地图接入**：补充景点地址、经纬度、POI ID、路线距离、耗时和景点图片
 - 🌦️ **天气感知提示**：前端展示天气预报，并根据雨天/阴天自动修正旅行提示
 - ⚡ **Redis 缓存层**：已接入天气查询、地图查询与 RAG 检索结果缓存，减少重复外部调用与重复检索开销
@@ -161,7 +163,7 @@ TripPlannerDemo/
 │   │   ├── agents/
 │   │   │   ├── trip_planner_agent.py    # LLM 行程生成与单日编辑逻辑
 │   │   │   └── tools/
-│   │   │       └── rag_tool.py          # 组织目的地检索上下文
+│   │   │       └── rag_tool.py          # Query Rewrite：把用户需求改写成更适合检索的 query
 │   │   ├── api/
 │   │   │   ├── main.py                  # FastAPI 应用入口
 │   │   │   └── routes/
@@ -173,7 +175,7 @@ TripPlannerDemo/
 │   │   │   └── db_models.py             # SQLAlchemy 数据库表定义
 │   │   ├── rag/
 │   │   │   ├── vector_db.py             # Markdown 切片、Chroma 入库与检索
-│   │   │   └── retriever.py             # 检索封装
+│   │   │   └── retriever.py             # 检索封装、RAG 缓存与轻量 Rerank
 │   │   └── services/
 │   │       ├── trip_service.py          # 行程主编排逻辑、预算计算、地图 enrich
 │   │       ├── cache_service.py         # Redis 缓存封装与降级逻辑
@@ -182,7 +184,7 @@ TripPlannerDemo/
 │   │       ├── storage_service.py       # SQLite 保存、查询、列表、删除
 │   │       └── export_service.py        # Markdown / PDF 渲染与导出
 │   ├── data/                  # 本地攻略文档
-│   ├── scripts/               # ingest、地图与真实行程验证脚本
+│   ├── scripts/               # ingest、地图验证与 RAG 在线检索调试脚本
 │   ├── tests/                 # pytest 测试
 │   ├── .env.example           # 后端环境变量模板
 │   └── requirements.txt
@@ -219,6 +221,10 @@ TripPlannerDemo/
   负责 Redis 客户端懒加载、JSON 缓存读写与 Redis 不可用时的优雅降级。
 - `backend/app/agents/trip_planner_agent.py`
   负责调用大模型生成结构化旅行草稿，并处理单日编辑时的 LLM 输出。
+- `backend/app/agents/tools/rag_tool.py`
+  负责 RAG 在线阶段的 Query Rewrite，把目的地、偏好、节奏与备注整理成更适合检索的 query。
+- `backend/app/rag/retriever.py`
+  负责基础向量召回后的结果封装、Redis 缓存以及轻量 Rerank，把更贴近旅行规划目标的片段排到前面。
 - `backend/app/services/map_service.py`
   负责对接高德地图 Web 服务，并结合 Redis 缓存补充地址、经纬度、路线估算和景点图片。
 - `backend/app/services/export_service.py`
@@ -229,6 +235,8 @@ TripPlannerDemo/
   负责前端与后端接口通信。
 - `frontend/src/views/Result.vue`
   负责承接 itinerary 的结果展示、地图、天气和导出交互。
+- `backend/scripts/debug_rag_retrieval.py`
+  负责调试 RAG 在线阶段，输出检索 query、top-k 召回片段、`rerank_score` 与 `rerank_reasons`。
 
 ---
 
@@ -476,8 +484,10 @@ cd frontend
   已完成 Redis 基础缓存层，当前已覆盖天气查询、地图查询与 RAG 检索结果缓存；后续可以继续扩展到会话态管理、热点目的地复用、异步任务状态保存与更细粒度的缓存命中统计。
 - 🚧 **实时信息增强**
   可接入联网搜索能力，补充景点营业状态、近期热门地点、节假日信息与实时出行建议，让本地攻略 RAG 与实时信息形成互补。
+- 🚧 **RAG 检索增强**
+  当前已完成第一轮在线阶段优化：接入轻量化 Query Rewrite、轻量 Rerank 与检索调试脚本；后续会继续推进检索结果压缩、去冗、混合检索，以及更高阶的 GraphRAG，用图结构表达城市、景点、路线与主题标签之间的关系，增强多地点联动推荐和行程合理性约束。
 - 🚧 **Agent 与工作流编排**
-  当前以 LangChain 为主，后续可以进一步尝试 LangGraph，把生成、检索、地图 enrich、天气补充、编辑与导出组织成更清晰的状态流。
+  当前以 LangChain 为主，后续可以进一步尝试 LangGraph，把生成、检索、地图 enrich、天气补充、编辑与导出组织成更清晰的状态流；如果继续升级成 Agent 化入口，也可以进一步引入基于 LLM 的意图识别路由，让系统先判断用户请求属于生成、编辑、查询还是导出，再分发到对应处理链路。
 - 🚧 **外部工具与 MCP 化**
   地图、天气、联网搜索、POI 检索这类外部能力后续可以逐步抽成 MCP 工具层，便于和不同 Agent 或工作流复用，而主业务编排继续保留在服务层。
 - 🚧 **模型效果提升**
