@@ -543,33 +543,59 @@ python test_trip_service_real.py
 ### 行程生成
 
 ```text
-Home.vue
-  -> POST /trip/generate
-  -> trip_service.py
-  -> trip_planner_agent.py
-  -> rag_tool.py / vector_db.py
-  -> map_service.py
-  -> Itinerary
+POST /trip/generate
+  -> trip.py（路由层）
+    -> trip_service.py（主编排）
+      -> ① rag_tool.py
+           Query Rewrite（LLM-based / 规则 fallback）
+           -> retriever.py
+               RAG 缓存检查
+               -> ChromaDB 向量召回
+               -> 噪声预过滤
+               -> Cross-encoder Rerank（缓存 -> API -> 规则 fallback）
+      -> ② trip_planner_agent.py
+           组装 Prompt（用户输入 + RAG 上下文）
+           -> qwen-max 生成结构化行程
+           -> Pydantic 校验输出
+      -> ③ map_service.py（逐景点）
+           地理编码 -> POI 搜索 -> 路线估算 -> 图片补充
+           （每步都有 Redis 缓存）
+      -> ④ weather_service.py
+           天气预报查询（Redis 缓存）
+      -> ⑤ 预算拆分计算
+      -> 返回 Itinerary
 ```
 
 ### 智能编辑
 
 ```text
-Result.vue
-  -> POST /trip/edit
-  -> trip_service.py
-  -> generate_day_edit_draft()
-  -> 更新目标 DayPlan
+POST /trip/edit
+  -> trip.py（路由层）
+    -> trip_service.py（主编排）
+      -> ① 定位目标 DayPlan（根据 edit_scope 解析 day_index）
+      -> ② trip_planner_agent.py
+           generate_day_edit_draft（LLM 生成单日编辑）
+           -> 失败则 fallback 到规则编辑（关键词匹配）
+      -> ③ 替换目标 DayPlan（theme / spots / meals / notes）
+      -> ④ map_service.py 重新 enrich（清除旧坐标，重新查询）
+      -> ⑤ 更新 tips 和 source_notes
+      -> 返回更新后的 Itinerary
 ```
 
-### PDF 导出
+### 保存与导出
 
 ```text
-点击导出 PDF
-  -> 前端先 POST /trip/save
-  -> 再 GET /export/{trip_id}/pdf
-  -> export_service.py
-  -> ReportLab 生成 PDF
+POST /trip/save
+  -> storage_service.py -> SQLite 持久化
+
+GET /export/{trip_id}/markdown
+  -> storage_service.py 读取 itinerary
+  -> export_service.py -> Jinja2 渲染 Markdown
+
+GET /export/{trip_id}/pdf
+  -> storage_service.py 读取 itinerary
+  -> export_service.py -> ReportLab 生成中文 PDF
+  -> Content-Disposition 返回下载文件名（RFC 编码兼容中文）
 ```
 
 ---
