@@ -194,6 +194,24 @@ flowchart TD
 
 数据流路径：前端收集用户输入 → 后端调用 LLM + RAG 生成结构化行程 → 地图服务补充地址、坐标、路线和图片 → 前端展示地图、天气、预算和每日行程 → 用户可保存、编辑、查看历史并导出文档。
 
+### 数据存储与缓存分工
+
+项目中将长期业务数据和短期高频查询结果分开处理：
+
+- **SQLite：负责持久化存储**
+  - 实现位置：`backend/app/config.py`、`backend/app/models/db_models.py`、`backend/app/services/storage_service.py`
+  - 使用场景：保存用户生成后的完整旅行方案，并支持历史列表、详情查询、删除和 Markdown/PDF 导出。
+  - 存储方式：通过 SQLAlchemy 定义 `TripRecord` 表，核心字段包括 `trip_id`、`destination`、`summary`、`itinerary_json`、`created_at`、`updated_at`。
+  - 设计原因：旅行方案属于用户主动保存的业务数据，需要长期保留、可查询、可删除；当前阶段采用 SQLite 轻量部署，适合个人项目和 Demo 场景。
+
+- **Redis：负责缓存加速**
+  - 实现位置：`backend/app/services/cache_service.py`，并被 `weather_service.py`、`map_service.py`、`retriever.py` 复用。
+  - 使用场景：缓存天气查询、高德地图地理编码/POI/路线结果、RAG 检索结果和 qwen3-rerank 重排序结果。
+  - 存储方式：业务模块生成缓存 key，`cache_service.py` 统一加上 `trip_planner` 前缀，将 Python `dict/list` 序列化为 JSON 字符串写入 Redis，并设置 TTL 自动过期。
+  - 设计原因：天气、地图和 RAG/Rerank 结果存在明显重复查询，且在一段时间内相对稳定；使用 Redis 可以减少外部 API 调用和重复检索开销，提升接口响应速度与稳定性。
+
+简言之：**SQLite 存“用户要留下来的行程数据”，Redis 存“短时间内可复用的中间查询结果”。**
+
 ### RAG 检索流程
 
 ```mermaid
@@ -539,6 +557,54 @@ python test_trip_service_real.py
 ---
 
 ## 🔄 关键业务链路
+
+### 显式编排工作流
+
+项目采用显式编排（而非 Agent 自主决策）的方式组织业务流程，每个步骤由 `trip_service.py` 按固定顺序调用，适合当前业务确定性强、步骤可预期的场景。
+
+```mermaid
+flowchart TD
+    User(("用户"))
+    FE["Frontend"]
+    Route["trip.py 路由层"]
+    TripSvc["trip_service.py 主编排"]
+
+    subgraph 编排步骤
+        Step1["① RAG 检索"]
+        Step2["② LLM 行程生成"]
+        Step3["③ 地图信息补全"]
+        Step4["④ 天气查询"]
+        Step5["⑤ 预算拆分"]
+    end
+
+    RAG["rag_tool.py + retriever.py"]
+    LLM["trip_planner_agent.py qwen-max"]
+    Map["map_service.py 高德地图"]
+    Weather["weather_service.py 高德天气"]
+    Result["返回 Itinerary"]
+
+    User --> FE --> Route --> TripSvc
+    TripSvc --> Step1 --> RAG
+    RAG --> Step2 --> LLM
+    LLM --> Step3 --> Map
+    Map --> Step4 --> Weather
+    Weather --> Step5 --> Result
+    Result -.-> FE -.-> User
+
+    classDef user fill:#eef2ff,stroke:#818cf8,color:#111;
+    classDef route fill:#f0fdfa,stroke:#2dd4bf,color:#111;
+    classDef svc fill:#fffbea,stroke:#facc15,color:#111;
+    classDef step fill:#fdf4ff,stroke:#e879f9,color:#111;
+    classDef ext fill:#fff1f2,stroke:#fb7185,color:#111;
+    classDef out fill:#f0fdf4,stroke:#4ade80,color:#111;
+
+    class User,FE user;
+    class Route route;
+    class TripSvc svc;
+    class Step1,Step2,Step3,Step4,Step5 step;
+    class RAG,LLM,Map,Weather ext;
+    class Result out;
+```
 
 ### 行程生成
 
