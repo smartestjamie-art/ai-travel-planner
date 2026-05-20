@@ -9,7 +9,7 @@
 ## 📝 最近更新
 
 - `2026-05-19`
-  - 工程观测：新增 token 消耗统计，覆盖 Query Rewrite、qwen3-rerank 与 Planner 生成行程链路，并在后端终端输出分项与总量。
+  - 工程观测：新增 token 消耗统计，覆盖 Query Rewrite、Query Embedding、qwen3-rerank 与 Planner 生成链路，并在后端终端输出分项与总量。
   - 接口能力：`/trip/generate` 返回 `token_usage` 字段，`/trip/stats` 支持汇总已保存行程的 token 消耗。
 - `2026-05-07`
   - RAG：完成 Cross-encoder Rerank（qwen3-rerank）+ 噪声预过滤，Top1 命中率 86.7%→93.3%，MRR 0.922→0.967。
@@ -57,7 +57,7 @@
 - 🗺️ **高德地图接入**：补充景点地址、经纬度、POI ID、路线距离、耗时和景点图片，并支持虚线箭头路线可视化与 🚩 打卡标记
 - 🌦️ **天气感知提示**：前端展示天气预报，并根据雨天/阴天自动修正旅行提示
 - ⚡ **Redis 缓存层**：覆盖天气、地图、RAG 检索与 Rerank 结果缓存，减少重复外部调用开销
-- 📊 **Token 消耗统计**：按 Query Rewrite、Rerank、Planner 分项统计输入/输出 token，并在后端日志与接口响应中返回总量
+- 📊 **Token 消耗统计**：按 Query Rewrite、Query Embedding、Rerank、Planner 分项统计输入/输出 token，并在后端日志与接口响应中返回总量
 - 💰 **预算拆分**：按交通、住宿、餐饮、门票、其他费用拆分，并支持按天展示
 - 🪄 **智能编辑**：支持用户用自然语言调整某一天行程
 - 🗂️ **历史管理**：支持保存、查看、打开、删除历史 itinerary
@@ -670,7 +670,7 @@ POST /trip/generate
       -> ④ weather_service.py
            天气预报查询（Redis 缓存）
       -> ⑤ 预算拆分计算
-      -> ⑥ 记录 token_usage（Query Rewrite / Rerank / Planner / Total）
+      -> ⑥ 记录 token_usage（Query Rewrite / Query Embedding / Rerank / Planner / Total）
       -> 返回 Itinerary
 ```
 
@@ -754,7 +754,7 @@ cd frontend
 - ✅ **后端能力**：行程生成、智能编辑、保存查询、历史列表、删除、天气查询、Markdown 导出与 PDF 导出接口
 - ✅ **AI 与数据能力**：LangChain 行程生成链路、5 个目的地攻略 RAG 检索、Chroma 入库检索、高德地图地址/坐标/路线/图片补充
 - ✅ **RAG 在线优化**：LLM-based Query Rewrite + Cross-encoder Rerank（qwen3-rerank）+ 噪声预过滤 + Rerank 缓存、检索调试脚本与 15 条评估样例集、量化评估指标体系（Top1/TopK Hit Rate、MRR、Noise Rate、Latency、Cross-destination Pollution）
-- ✅ **Token 观测能力**：`/trip/generate` 返回本次 Query Rewrite、Rerank、Planner 的分项 token 消耗，后端终端同步打印 prompt/completion/total，`/trip/stats` 汇总已保存行程的 token 统计
+- ✅ **Token 观测能力**：`/trip/generate` 返回本次 Query Rewrite、Query Embedding、Rerank、Planner 的分项 token 消耗，后端终端同步打印 prompt/completion/total，`/trip/stats` 汇总已保存行程的 token 统计
 - ✅ **前端能力**：规划页、结果页、历史列表页，以及地图/天气/预算展示、导出与历史管理主流程
 - ✅ **缓存与持久化**：SQLite 持久化存储 + Redis 缓存层（覆盖天气、地图、RAG 检索与 Rerank 结果）
 - ✅ **验证情况**：核心链路稳定跑通，Redis 缓存 key 可在本地容器中验证写入
