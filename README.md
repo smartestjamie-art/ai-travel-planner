@@ -353,6 +353,8 @@ TripPlannerDemo/
 │   ├── eval/                  # RAG 检索评估样例集
 │   ├── scripts/               # ingest、地图验证、RAG 调试与评估脚本
 │   ├── tests/                 # pytest 测试
+│   ├── Dockerfile             # 后端容器打包配置
+│   ├── .dockerignore          # Docker 构建排除规则
 │   ├── .env.example           # 后端环境变量模板
 │   └── requirements.txt
 ├── frontend/
@@ -369,8 +371,12 @@ TripPlannerDemo/
 │   │   │   └── AmapTripMap.vue          # 地图展示组件
 │   │   ├── App.vue                      # 页面切换入口
 │   │   └── main.ts                      # 前端入口
+│   ├── Dockerfile             # 前端两阶段构建（Node 编译 → Nginx 托管）
+│   ├── nginx.conf             # Nginx 配置（静态文件 + API 反向代理）
+│   ├── .dockerignore          # Docker 构建排除规则
 │   ├── .env.example           # 前端环境变量模板
 │   └── package.json
+├── docker-compose.yaml        # 服务编排（后端 + 前端 + Redis）
 ├── assets/
 │   └── showcase/              # README 展示截图
 ├── CHANGELOG.md               # 项目功能与架构更新日志
@@ -472,6 +478,75 @@ npm run dev
 ```text
 http://127.0.0.1:5173
 ```
+
+---
+
+## 🐳 Docker 部署
+
+项目支持 Docker Compose 一键部署，将后端、前端和 Redis 打包为三个容器，统一编排管理。
+
+### 架构
+
+```text
+浏览器
+  │
+  ▼
+┌─────────────────────────────────┐
+│  Nginx（前端容器，端口 80）       │
+│  ├── 返回 Vue 静态文件           │
+│  └── /api/* 代理到后端 ─────────┼──┐
+└─────────────────────────────────┘  │
+                                     ▼
+┌─────────────────────────────────┐
+│  FastAPI（后端容器，端口 8000）   │
+│  行程生成 / 编辑 / 天气 / 导出   │
+└─────────────────────────────────┘
+         │
+         ▼
+┌─────────────────────────────────┐
+│  Redis（缓存容器，端口 6379）     │
+│  缓存天气、地图、RAG 结果        │
+└─────────────────────────────────┘
+```
+
+### 新增文件说明
+
+| 文件 | 作用 |
+|------|------|
+| `backend/Dockerfile` | 后端打包：Python 3.11 精简镜像，安装依赖后运行 uvicorn |
+| `frontend/Dockerfile` | 前端两阶段构建：Node 20 编译 Vue → Nginx alpine 托管静态文件 |
+| `frontend/nginx.conf` | Nginx 配置：静态文件托管 + API 反向代理到后端容器 |
+| `docker-compose.yaml` | 服务编排：定义 Redis、后端、前端三个容器的依赖关系和端口映射 |
+| `backend/.dockerignore` | 排除 `__pycache__`、`.env`、`db/` 等不需要打包的文件 |
+| `frontend/.dockerignore` | 排除 `node_modules`、`dist` 等不需要打包的文件 |
+
+### 启动
+
+> **前提**：需要先安装并启动 [Docker Desktop](https://www.docker.com/products/docker-desktop/)，等待左下角显示"Engine running"后再执行以下命令。
+
+```bash
+# 首次构建（需要几分钟下载镜像和安装依赖）
+docker compose up --build
+
+# 后台运行
+docker compose up --build -d
+```
+
+启动后访问 `http://localhost`。
+
+### 停止
+
+```bash
+docker compose down
+```
+
+### 关键设计
+
+- **两阶段构建**：前端用 Node 编译出静态文件后，只把产物复制到 Nginx 镜像，最终镜像不含 Node.js，体积从几百 MB 缩小到几十 MB。
+- **Nginx 反向代理**：前端静态文件由 Nginx 直接返回，API 请求通过 `proxy_pass` 转发给后端容器，统一入口，避免跨域问题。
+- **层缓存优化**：后端 Dockerfile 先复制 `requirements.txt` 安装依赖，再复制代码。改代码时不会重新安装依赖。
+- **环境变量隔离**：`.env` 文件通过 `env_file` 注入容器，不打包进镜像，避免泄露 API Key。
+- **数据持久化**：Redis 数据、SQLite 数据库和知识库 markdown 文件通过 Docker volumes 挂载，容器重建后数据不丢失。
 
 ---
 
