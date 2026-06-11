@@ -8,6 +8,9 @@
 
 ## 📝 最近更新
 
+- `2026-06-11`
+  - 部署：新增 Docker Compose 容器化部署方案，后端（FastAPI）、前端（Nginx）、Redis 三容器编排，`docker compose up` 一键启动。
+  - 前端：Nginx 反向代理统一前后端入口，两阶段构建优化镜像体积。
 - `2026-05-19`
   - 工程观测：新增 token 消耗统计，覆盖 Query Rewrite、Query Embedding、qwen3-rerank 与 Planner 生成链路，并在后端终端输出分项与总量。
   - 接口能力：`/trip/generate` 返回 `token_usage` 字段，`/trip/stats` 支持汇总已保存行程的 token 消耗。

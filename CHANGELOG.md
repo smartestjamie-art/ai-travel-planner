@@ -2,6 +2,17 @@
 
 > 这里只记录项目功能、架构和工程能力相关的更新，不记录简历、面试文档等个人整理内容。
 
+## 2026-06-11
+
+### Docker 容器化部署
+
+- 新增 `backend/Dockerfile`：基于 Python 3.11-slim 镜像，先复制 `requirements.txt` 安装依赖（利用层缓存），再复制应用代码，运行 uvicorn。
+- 新增 `frontend/Dockerfile`：两阶段构建——Node 20 编译 Vue 应用，Nginx alpine 托管静态文件，最终镜像不含 Node.js，体积从几百 MB 缩小到几十 MB。
+- 新增 `frontend/nginx.conf`：Nginx 配置，负责静态文件托管 + API 反向代理到后端容器，`try_files` 支持 Vue SPA 路由。
+- 新增 `docker-compose.yaml`：编排 Redis、后端、前端三个服务，定义依赖关系、端口映射、数据卷持久化和环境变量注入。
+- 新增 `.dockerignore`：排除 `__pycache__`、`.env`、`node_modules` 等不需要打包的文件。
+- 后端 `main.py` 新增 Docker 环境的 CORS 允许源（`http://localhost`、`http://localhost:80`）。
+
 ## 2026-04-15
 
 ### Redis 缓存优化
@@ -269,9 +280,18 @@ trip_planner:rerank:厦门 骑行 海景 休闲 日落 放松:14207650ed1a
 [token_usage] Total: prompt=3016, completion=456, all=3472
 ```
 
+**四种模型调用的 token 消耗**
+
+| 调用 | 模型 | 输入 token | 输出 token | 原因 |
+|------|------|-----------|-----------|------|
+| Query Rewrite | qwen-max | ✅ 有 | ✅ 有 | 生成式 LLM，输入 prompt，输出关键词文本 |
+| Query Embedding | text-embedding-v4 | ✅ 有 | ❌ 0 | 只把文本转向量，不生成文本 |
+| Rerank | qwen3-rerank | ✅ 有 | ❌ 0 | 只算相关性分数，不生成文本 |
+| 行程生成 | qwen-max | ✅ 有 | ✅ 有 | 生成式 LLM，输入 prompt，输出 JSON 行程 |
+
 **说明**
 
 - `source=api` 表示 Query Embedding 和 Rerank token 均来自 DashScope 官方响应字段，不是本地估算。
 - 本次统计只覆盖在线请求成本：Query Rewrite、Query Embedding、Rerank、Planner；离线知识库切片入库时的 document embedding 不计入单次 `/trip/generate`。
-- Rerank 的 `completion=0` 属于正常现象，因为 Rerank 任务主要是对候选文档打分排序，不生成自然语言正文。
+- Rerank 和 Embedding 的 `completion=0` 属于正常现象，因为 Embedding 输出向量、Rerank 输出分数，都不生成自然语言正文。
 - `/trip/generate` 返回结果中会同步包含 `token_usage`，便于前端或调试工具查看本次生成成本。
