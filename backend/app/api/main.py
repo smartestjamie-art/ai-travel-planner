@@ -32,13 +32,13 @@ app.add_middleware(
 
 @app.get("/")
 def read_root() -> dict[str, str]:
-    """根路径接口，用于确认后端服务已启动。"""
+    """Root endpoint used to confirm the backend service is running."""
     return {"message": "Trip Planner Demo backend is running."}
 
 
 @app.get("/health")
 def health_check() -> dict[str, str]:
-    """健康检查接口。"""
+    """Health check endpoint."""
     return {"status": "ok"}
 
 

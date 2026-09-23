@@ -15,22 +15,22 @@ from app.services.map_service import estimate_route, geocode_address, search_pla
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="手工测试高德地图 service。")
-    parser.add_argument("--keyword", default="大理古城", help="POI 搜索关键词")
-    parser.add_argument("--city", default="大理", help="搜索城市")
-    parser.add_argument("--address", default="云南省大理白族自治州大理古城", help="待地理编码的地址")
+    parser = argparse.ArgumentParser(description="Manually test the Amap map service.")
+    parser.add_argument("--keyword", default="Dali Ancient City", help="POI search keyword")
+    parser.add_argument("--city", default="Dali", help="City to search in")
+    parser.add_argument("--address", default="Dali Ancient City, Dali Bai Autonomous Prefecture, Yunnan Province", help="Address to geocode")
     args = parser.parse_args()
 
-    print("=== POI 搜索 ===")
+    print("=== POI Search ===")
     places = search_places(keyword=args.keyword, city=args.city)
     print(json.dumps(places, ensure_ascii=False, indent=2))
 
-    print("\n=== 地理编码 ===")
+    print("\n=== Geocoding ===")
     geocode = geocode_address(address=args.address, city=args.city)
     print(json.dumps(geocode, ensure_ascii=False, indent=2))
 
     if geocode and geocode.get("latitude") is not None and geocode.get("longitude") is not None:
-        print("\n=== 路线估算（同点位示例）===")
+        print("\n=== Route Estimate (same-point example) ===")
         route = estimate_route(
             origin_longitude=geocode["longitude"],
             origin_latitude=geocode["latitude"],

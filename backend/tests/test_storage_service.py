@@ -14,23 +14,23 @@ from app.services.trip_service import generate_trip_itinerary  # noqa: E402
 
 
 def build_trip_request() -> TripRequest:
-    """构造一个合法的 TripRequest，供存储层测试复用。"""
+    """Build a valid TripRequest for reuse in storage layer tests."""
     return TripRequest(
-        destination="大理",
+        destination="Dali",
         start_date="2026-04-10",
         end_date="2026-04-12",
         travelers=2,
         budget=3200,
-        preferences=["自然风景", "拍照", "美食"],
-        pace="轻松",
-        dietary_preferences=["少辣"],
-        hotel_level="舒适型",
-        special_notes="不想太早起床，希望安排一个适合看日落的地点",
+        preferences=["natural scenery", "photography", "food"],
+        pace="relaxed",
+        dietary_preferences=["mild spice"],
+        hotel_level="comfortable",
+        special_notes="Don't want to wake up too early; would like a spot suitable for watching the sunset",
     )
 
 
 def test_save_itinerary_returns_trip_id() -> None:
-    """测试保存 itinerary 后会返回 trip_id。"""
+    """Test that saving an itinerary returns a trip_id."""
     itinerary = generate_trip_itinerary(build_trip_request())
     itinerary.trip_id = f"{itinerary.trip_id}_{uuid.uuid4().hex[:8]}"
 
@@ -40,7 +40,7 @@ def test_save_itinerary_returns_trip_id() -> None:
 
 
 def test_get_itinerary_by_trip_id_returns_saved_result() -> None:
-    """测试可以根据 trip_id 读回已保存的 itinerary。"""
+    """Test that a saved itinerary can be read back by trip_id."""
     itinerary = generate_trip_itinerary(build_trip_request())
     itinerary.trip_id = f"{itinerary.trip_id}_{uuid.uuid4().hex[:8]}"
 
@@ -49,11 +49,11 @@ def test_get_itinerary_by_trip_id_returns_saved_result() -> None:
 
     assert trip_detail is not None
     assert trip_detail.trip_id == itinerary.trip_id
-    assert trip_detail.itinerary.destination == "大理"
+    assert trip_detail.itinerary.destination == "Dali"
     assert len(trip_detail.itinerary.days) == 3
 
 
 def test_get_itinerary_by_trip_id_returns_none_for_missing_trip() -> None:
-    """测试查询不存在的 trip_id 时会返回 None。"""
+    """Test that querying a non-existent trip_id returns None."""
     trip_detail = get_itinerary_by_trip_id("trip_not_exists")
     assert trip_detail is None

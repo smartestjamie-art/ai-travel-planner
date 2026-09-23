@@ -19,7 +19,7 @@ from app.rag.retriever import retrieve_travel_guide_chunks
 
 DEFAULT_CASES_PATH = BACKEND_DIR / "eval" / "rag_eval_cases.json"
 
-ALL_DESTINATIONS = ["大理", "成都", "西安", "厦门", "三亚"]
+ALL_DESTINATIONS = ["Dali", "Chengdu", "Xi'an", "Xiamen", "Sanya"]
 
 
 def _load_cases(path: Path) -> list[dict[str, Any]]:
@@ -71,21 +71,23 @@ def _evaluate_case(case: dict[str, Any]) -> dict[str, Any]:
         1 for title in titles if _contains_any(title, noise_title_keywords)
     )
 
-    # MRR: 第一个命中期望关键词的结果排名的倒数
+    # MRR: reciprocal of the rank of the first result that hits an expected keyword
     reciprocal_rank = 0.0
     for rank, title in enumerate(titles, start=1):
         if _contains_any(title, expected_title_keywords):
             reciprocal_rank = 1.0 / rank
             break
 
-    # 跨目的地污染：片段来源包含非当前目的地的城市名
-    other_destinations = [d for d in ALL_DESTINATIONS if d not in destination]
+    # Cross-destination pollution: chunk source contains a city name other than the current destination
+    # (case-insensitive: source filenames like "chengdu_guide.md" are lowercase pinyin while
+    # destination/title strings use capitalized English city names)
+    other_destinations = [d for d in ALL_DESTINATIONS if d.lower() not in destination.lower()]
     pollution_count = 0
     for chunk in chunks:
         source = str(chunk.get("source", ""))
         title = str(chunk.get("title", ""))
-        chunk_text = f"{source} {title}"
-        if any(other in chunk_text for other in other_destinations):
+        chunk_text = f"{source} {title}".lower()
+        if any(other.lower() in chunk_text for other in other_destinations):
             pollution_count += 1
 
     return {

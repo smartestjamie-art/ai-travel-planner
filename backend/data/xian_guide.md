@@ -1,66 +1,66 @@
-# 2026 西安深度游玩全攻略
+# 2026 Complete Xi'an Travel Guide
 
-## 1. 目的地简介
-西安古称长安，是十三朝古都，丝绸之路的起点。这里历史底蕴深厚，秦始皇兵马俑、古城墙、大雁塔等古迹举世闻名。西安的美食以面食为主，肉夹馍、羊肉泡馍、凉皮是代表性小吃。适合历史文化爱好者、美食探索者和亲子研学旅行。
+## 1. Destination Overview
+Xi'an, historically known as Chang'an, served as the capital for thirteen dynasties and was the starting point of the Silk Road. Its historical legacy runs deep, with world-famous sites like the Terracotta Army, the ancient city wall, and the Giant Wild Goose Pagoda. Xi'an's cuisine centers on wheat-based dishes, with rou jia mo (Chinese hamburger), yang rou paomo (lamb soup with bread), and liangpi (cold noodles) as signature snacks. It's great for history buffs, food explorers, and family educational trips.
 
-## 2. 核心景点推荐 (含门票与位置信息)
+## 2. Top Attractions (with Admission and Location Info)
 
-### 2.1 秦始皇兵马俑博物馆
-* **位置**：西安市临潼区秦陵北路（距市区约 1 小时车程）
-* **门票**：120元/人
-* **游玩时长**：3-4小时
-* **简介**：世界第八大奇迹，秦始皇陵的陪葬坑。目前已发掘三个俑坑，其中一号坑规模最大，数千个兵马俑排列整齐，气势恢宏。建议请讲解员或租讲解器，否则只是"看泥人"。
+### 2.1 Terracotta Army Museum
+* **Location**: Qinling North Road, Lintong District, Xi'an (about a 1-hour drive from downtown)
+* **Admission**: 120 yuan/person
+* **Suggested Duration**: 3-4 hours
+* **Overview**: Often called the eighth wonder of the world, this site holds the burial pits of Emperor Qin Shi Huang's mausoleum. Three excavation pits are currently open, with Pit 1 the largest — thousands of terracotta warriors stand in orderly ranks, an awe-inspiring sight. It's worth hiring a guide or renting an audio guide, otherwise it can feel like "just looking at clay figures."
 
-### 2.2 西安城墙
-* **位置**：西安市碑林区南门
-* **门票**：54元/人
-* **游玩时长**：2-3小时
-* **简介**：中国现存最完整的古代城墙，周长约 14 公里。可以租自行车骑行环城，傍晚时分登墙看日落是经典体验。南门是最主要的登城点，晚上有仿古入城仪式表演。
+### 2.2 Xi'an City Wall
+* **Location**: South Gate, Beilin District, Xi'an
+* **Admission**: 54 yuan/person
+* **Suggested Duration**: 2-3 hours
+* **Overview**: The most complete ancient city wall surviving in China, roughly 14 kilometers in circumference. Rent a bike and cycle the full loop, or climb up at dusk to watch the sunset — a classic experience. The South Gate is the main access point and hosts a re-enacted city-entry ceremony in the evening.
 
-### 2.3 大雁塔
-* **位置**：西安市雁塔区雁塔南路
-* **门票**：登塔 30元/人（广场免费）
-* **游玩时长**：1-2小时
-* **简介**：唐代高僧玄奘为保存佛经而修建的佛塔，是西安的标志性建筑。北广场有亚洲最大的音乐喷泉，晚上观赏效果最佳。
+### 2.3 Giant Wild Goose Pagoda
+* **Location**: Yanta South Road, Yanta District, Xi'an
+* **Admission**: Climbing the pagoda 30 yuan/person (the plaza is free)
+* **Suggested Duration**: 1-2 hours
+* **Overview**: Built by the Tang-dynasty monk Xuanzang to house Buddhist scriptures, this pagoda is one of Xi'an's landmark structures. The North Plaza features Asia's largest musical fountain, best viewed at night.
 
-### 2.4 回民街
-* **位置**：西安市莲湖区北院门
-* **门票**：免费
-* **游玩时长**：2-3小时
-* **简介**：西安最著名的美食街区，聚集了各种西北特色小吃。肉夹馍、羊肉泡馍、biangbiang面、镜糕、酸梅汤等应有尽有。注意：部分店铺面向游客价格偏高，可以往巷子深处走找本地人常去的店。
+### 2.4 Muslim Quarter (Huimin Street)
+* **Location**: Beiyuanmen, Lianhu District, Xi'an
+* **Admission**: Free
+* **Suggested Duration**: 2-3 hours
+* **Overview**: Xi'an's most famous food street, packed with northwestern Chinese specialties. You'll find everything from rou jia mo and yang rou paomo to biangbiang noodles, mirror cakes, and sour plum juice. Note: some shops facing the main street charge tourist-inflated prices — head deeper into the side alleys for the spots locals actually frequent.
 
-### 2.5 陕西历史博物馆
-* **位置**：西安市雁塔区小寨东路 91 号
-* **门票**：免费（需提前预约）；珍宝馆 30元/人
-* **游玩时长**：3-4小时
-* **简介**：中国第一座大型现代化国家级博物馆，馆藏文物 170 余万件，从远古到明清的陕西历史全覆盖。何家村窖藏和唐三彩是镇馆之宝。建议预留半天时间。
+### 2.5 Shaanxi History Museum
+* **Location**: 91 Xiaozhai East Road, Yanta District, Xi'an
+* **Admission**: Free (advance reservation required); Treasures Hall 30 yuan/person
+* **Suggested Duration**: 3-4 hours
+* **Overview**: China's first large-scale modern national museum, holding over 1.7 million artifacts that trace Shaanxi's history from antiquity through the Ming and Qing dynasties. The Hejiacun hoard and Tang tri-color glazed pottery are the museum's prized pieces. Plan to spend half a day here.
 
-## 3. 特色餐饮与预算参考
+## 3. Local Food and Budget Guide
 
-* **肉夹馍**：西安代表小吃，腊汁肉夹白吉馍，人均预算 **15-25元**。
-* **羊肉泡馍**：西安经典主食，需自己掰馍，人均预算 **35-50元**。
-* **biangbiang 面**：又宽又长的裤带面，油泼辣子拌着吃，人均预算 **20-30元**。
-* **凉皮**：夏天解暑佳品，麻酱或辣椒油两种口味，人均预算 **10-15元**。
-* **甑糕**：糯米红枣蒸制的甜食，人均预算 **8-12元**。
-* **酸梅汤**：西安街头标配饮品，人均预算 **5-10元**。
+* **Rou Jia Mo**: Xi'an's signature snack — braised meat stuffed into a baijimo flatbread; budget **15-25 yuan per person**.
+* **Yang Rou Paomo**: A classic Xi'an dish where you tear up flatbread yourself before it's cooked into a lamb soup; budget **35-50 yuan per person**.
+* **Biangbiang Noodles**: Wide, belt-like noodles tossed with chili oil; budget **20-30 yuan per person**.
+* **Liangpi (Cold Noodles)**: A refreshing summer favorite, available with sesame paste or chili oil; budget **10-15 yuan per person**.
+* **Zeng Gao**: A steamed sweet made with glutinous rice and red dates; budget **8-12 yuan per person**.
+* **Sour Plum Juice**: A classic Xi'an street drink; budget **5-10 yuan per person**.
 
-## 4. 住宿区域建议
+## 4. Where to Stay
 
-* **钟楼/鼓楼周边**：市中心核心位置，交通四通八达，步行可达回民街。酒店预算：**250-500元/晚**。
-* **大雁塔/小寨周边**：靠近大雁塔和陕西历史博物馆，商圈成熟。酒店预算：**200-400元/晚**。
-* **南门城墙周边**：适合喜欢古城氛围的游客，夜景优美。酒店预算：**200-450元/晚**。
+* **Bell Tower / Drum Tower Area**: The core downtown location, with excellent transport links and walking access to the Muslim Quarter. Hotel budget: **250-500 yuan/night**.
+* **Giant Wild Goose Pagoda / Xiaozhai Area**: Close to the Giant Wild Goose Pagoda and Shaanxi History Museum, in a well-developed commercial district. Hotel budget: **200-400 yuan/night**.
+* **South Gate / City Wall Area**: Great for travelers who love an old-city atmosphere, with beautiful night views. Hotel budget: **200-450 yuan/night**.
 
-## 5. 经典三日行程参考 (Agent 提取样本)
+## 5. Sample Classic 3-Day Itinerary (Agent Extraction Sample)
 
-* **第一天：古都初印象**
-  * 上午：参观【陕西历史博物馆】，了解陕西从远古到明清的历史脉络。
-  * 下午：前往【大雁塔】，游览大慈恩寺，傍晚在北广场看音乐喷泉。
-  * 晚上：在大雁塔南广场周边用餐，品尝 biangbiang 面。
-* **第二天：秦风唐韵**
-  * 上午：前往【秦始皇兵马俑博物馆】，建议请讲解，参观一号坑、二号坑、三号坑。
-  * 下午：返回市区，登【西安城墙】骑行，感受古城墙的宏伟。
-  * 晚上：在回民街品尝肉夹馍、羊肉泡馍、甑糕等小吃。
-* **第三天：市井与历史**
-  * 上午：参观碑林博物馆，欣赏历代碑刻书法。
-  * 下午：逛书院门古文化街，购买文创纪念品。
-  * 晚上：在钟鼓楼广场看夜景，品尝凉皮和酸梅汤。
+* **Day 1: First Impressions of the Ancient Capital**
+  * Morning: Visit the **Shaanxi History Museum** to trace Shaanxi's history from antiquity to the Ming and Qing dynasties.
+  * Afternoon: Head to the **Giant Wild Goose Pagoda**, visit Da Ci'en Temple, and watch the musical fountain at the North Plaza at dusk.
+  * Evening: Dine near the pagoda's South Plaza and try biangbiang noodles.
+* **Day 2: Qin Grandeur and Tang Splendor**
+  * Morning: Visit the **Terracotta Army Museum** — hire a guide and tour Pits 1, 2, and 3.
+  * Afternoon: Return downtown and cycle along the **Xi'an City Wall** to take in its grandeur.
+  * Evening: Sample rou jia mo, yang rou paomo, and zeng gao in the Muslim Quarter.
+* **Day 3: Street Life and History**
+  * Morning: Visit the Beilin (Stele Forest) Museum to admire calligraphy carved in stone through the ages.
+  * Afternoon: Stroll Shuyuanmen, the old cultural street, and pick up souvenirs.
+  * Evening: Enjoy the night view at the Bell and Drum Tower Square and try liangpi and sour plum juice.

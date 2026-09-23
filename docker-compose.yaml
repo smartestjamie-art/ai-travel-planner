@@ -1,5 +1,5 @@
 services:
-  # Redis 缓存（可选）
+  # Redis cache (optional)
   redis:
     image: redis:7-alpine
     ports:
@@ -8,7 +8,7 @@ services:
       - redis_data:/data
     restart: unless-stopped
 
-  # 后端 FastAPI
+  # Backend FastAPI
   backend:
     build: ./backend
     ports:
@@ -25,7 +25,7 @@ services:
       - redis
     restart: unless-stopped
 
-  # 前端 Vue + Nginx
+  # Frontend Vue + Nginx
   frontend:
     build: ./frontend
     ports:

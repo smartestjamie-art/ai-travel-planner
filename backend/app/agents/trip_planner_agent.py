@@ -16,38 +16,38 @@ from app.models.schemas import DayPlan, TripEditRequest, TripRequest
 
 
 class PlannerDayDraft(BaseModel):
-    """LLM 返回的单日最小行程草稿。"""
+    """The minimal single-day itinerary draft returned by the LLM."""
 
     day_index: int = Field(..., ge=1)
-    theme: str = Field(..., description="当天的简短主题")
-    spot_name: str = Field(..., description="当天主要景点名称")
-    spot_description: str = Field(..., description="推荐该景点的简短理由")
-    meal_name: str = Field(..., description="当天的餐饮或餐厅建议")
-    meal_notes: str = Field(..., description="简短的用餐说明")
-    daily_note: str = Field(..., description="当天的一条简短规划备注")
+    theme: str = Field(..., description="Short theme for the day")
+    spot_name: str = Field(..., description="Name of the main attraction for the day")
+    spot_description: str = Field(..., description="Short reason for recommending this attraction")
+    meal_name: str = Field(..., description="Meal or restaurant suggestion for the day")
+    meal_notes: str = Field(..., description="Short dining notes")
+    daily_note: str = Field(..., description="A short planning note for the day")
 
 
 class PlannerDraft(BaseModel):
-    """提供给 trip_service.py 使用的结构化行程草稿。"""
+    """Structured itinerary draft provided for use by trip_service.py."""
 
-    summary: str = Field(..., description="整趟旅行的简短概述")
-    tips: list[str] = Field(default_factory=list, description="旅行提示")
+    summary: str = Field(..., description="Short overview of the entire trip")
+    tips: list[str] = Field(default_factory=list, description="Travel tips")
     days: list[PlannerDayDraft] = Field(default_factory=list)
 
 
 class DayEditDraft(BaseModel):
-    """LLM 返回的单日编辑草稿。"""
+    """The single-day edit draft returned by the LLM."""
 
-    theme: str = Field(..., description="编辑后的当天主题")
-    spot_name: str = Field(..., description="编辑后的主要景点名称")
-    spot_description: str = Field(..., description="编辑后的景点说明")
-    meal_name: str = Field(..., description="编辑后的餐饮名称")
-    meal_notes: str = Field(..., description="编辑后的餐饮说明")
-    daily_note: str = Field(..., description="编辑后的当天备注")
+    theme: str = Field(..., description="Edited theme for the day")
+    spot_name: str = Field(..., description="Edited main attraction name")
+    spot_description: str = Field(..., description="Edited attraction description")
+    meal_name: str = Field(..., description="Edited meal name")
+    meal_notes: str = Field(..., description="Edited meal notes")
+    daily_note: str = Field(..., description="Edited note for the day")
 
 
 def _normalize_day_edit_payload(payload: dict) -> dict:
-    """兼容模型返回的两种单日编辑格式。"""
+    """Support both single-day edit formats that the model may return."""
     if "spot_name" in payload and "meal_name" in payload and "daily_note" in payload:
         return payload
 
@@ -73,7 +73,7 @@ def _normalize_day_edit_payload(payload: dict) -> dict:
 
 
 def _extract_json_object(raw_text: str) -> str | None:
-    """从模型原始文本中尽量提取 JSON 对象字符串。"""
+    """Best-effort extraction of a JSON object string from the model's raw text."""
     text = raw_text.strip()
 
     if text.startswith("```"):
@@ -101,7 +101,7 @@ def collect_trip_context(
     special_notes: str | None = None,
     top_k: int = 5,
 ) -> tuple[list[str], dict[str, int], dict[str, int], dict[str, int]]:
-    """收集本地攻略片段。返回 (contexts, rewrite_usage, rerank_usage, embedding_usage)。"""
+    """Collect local guide snippets. Returns (contexts, rewrite_usage, rerank_usage, embedding_usage)."""
     return get_destination_guide_context(
         destination=destination,
         preferences=preferences,
@@ -112,7 +112,7 @@ def collect_trip_context(
 
 
 def _build_chat_llm():
-    """创建通用 ChatOpenAI 实例。"""
+    """Create a generic ChatOpenAI instance."""
     if not LLM_API_KEY:
         return None
 
@@ -132,7 +132,7 @@ def _build_chat_llm():
 
 
 def _extract_token_usage(response) -> dict[str, int]:
-    """从 LangChain AIMessage 中提取 token 使用量。"""
+    """Extract token usage from a LangChain AIMessage."""
     usage = {"prompt_tokens": 0, "completion_tokens": 0}
     metadata = getattr(response, "response_metadata", None) or {}
     token_usage = metadata.get("token_usage", {})
@@ -148,75 +148,76 @@ def generate_planner_draft(
     day_count: int,
 ) -> tuple[PlannerDraft | None, dict[str, int]]:
     """
-    使用 LangChain 生成结构化行程草稿。返回 (draft, token_usage)。
+    Generate a structured itinerary draft using LangChain. Returns (draft, token_usage).
 
-    如果当前环境还没有准备好模型调用条件，就返回 None，
-    这样 service 层还能回退到规则版实现。
+    If the current environment is not yet ready for a model call, return None
+    so the service layer can fall back to the rule-based implementation.
     """
     empty_usage = {"prompt_tokens": 0, "completion_tokens": 0}
     llm = _build_chat_llm()
     if llm is None:
         return None, empty_usage
 
-    guide_context = "\n\n".join(rag_contexts) if rag_contexts else "暂无本地攻略上下文。"
+    guide_context = "\n\n".join(rag_contexts) if rag_contexts else "No local guide context available."
 
     system_prompt = (
-        "你是一名旅行规划助手。"
-        "请用中文生成简洁的结构化旅行草稿。"
-        "需要遵守用户给出的目的地、预算、节奏和本地攻略上下文。"
-        "你必须只输出一个 JSON 对象，不要输出 Markdown，不要输出解释文字，不要输出代码块。"
-        "输出内容必须严格符合给定的结构化字段要求。"
-        "如果用户在额外备注里提出了明确诉求，例如看日落、不想早起、少辣、拍照等，你要优先把这些诉求落实到具体某一天的主要景点或当天安排里，而不是只写成泛泛的提示。"
-        "如果用户明确提到想看日落，请优先把适合看日落的地点安排为某一天的主要景点，或至少让当天主景点与日落安排保持强关联。"
+        "You are a travel planning assistant."
+        "Generate a concise, structured travel draft in English."
+        "You must always respond in English, regardless of the language of the local guide context or user notes."
+        "You must follow the destination, budget, pace, and local guide context given by the user."
+        "You must output only a single JSON object — no Markdown, no explanatory text, no code blocks."
+        "The output must strictly conform to the required structured fields."
+        "If the user raises explicit requests in the additional notes, such as watching a sunset, not wanting to wake up early, avoiding spicy food, or taking photos, prioritize actually incorporating these requests into a specific day's main attraction or that day's plan, rather than just writing a vague tip."
+        "If the user explicitly mentions wanting to watch a sunset, prioritize arranging a location suitable for watching the sunset as the main attraction for a given day, or at least ensure the day's main attraction is strongly related to the sunset plan."
     )
 
     human_prompt = f"""
-目的地：{request.destination}
-出发日期：{request.start_date.isoformat()}
-结束日期：{request.end_date.isoformat()}
-天数：{day_count}
-人数：{request.travelers}
-预算：{request.budget}
-偏好：{'、'.join(request.preferences) if request.preferences else '无特别偏好'}
-节奏：{request.pace or '适中'}
-饮食偏好：{'、'.join(request.dietary_preferences) if request.dietary_preferences else '无'}
-酒店档次：{request.hotel_level or '舒适型'}
-额外备注：{request.special_notes or '无'}
+Destination: {request.destination}
+Start date: {request.start_date.isoformat()}
+End date: {request.end_date.isoformat()}
+Number of days: {day_count}
+Travelers: {request.travelers}
+Budget: {request.budget}
+Preferences: {', '.join(request.preferences) if request.preferences else 'No particular preference'}
+Pace: {request.pace or 'Moderate'}
+Dietary preferences: {', '.join(request.dietary_preferences) if request.dietary_preferences else 'None'}
+Hotel tier: {request.hotel_level or 'Comfort'}
+Additional notes: {request.special_notes or 'None'}
 
-本地攻略上下文：
+Local guide context:
 {guide_context}
 
-要求：
-1. 输出一个整体 summary。
-2. 输出 {day_count} 天的 daily draft。
-3. 每天只给一个主要景点、一个餐饮建议和一条当天备注。
-4. tips 保持简洁。
-5. day_index 必须从 1 到 {day_count}。
-6. 如果额外备注里有“想看日落”“不想早起”这类明确要求，必须在 days 中体现，不要只放到 tips。
-7. 如果安排了看日落，当天的 spot_name 应尽量就是适合看日落的地点，或与 daily_note 中的日落安排保持一致，避免“主景点”和“日落地点”完全割裂。
-8. 每天的安排要符合“轻松”节奏，避免过满、避免太早出发。
-9. 餐饮建议尽量优先使用本地攻略上下文里已经出现的特色餐饮。
-10. 只返回 JSON 对象，不要返回任何额外说明，不要使用 ```json 代码块。
+Requirements:
+1. Output an overall summary.
+2. Output a daily draft for {day_count} days.
+3. Each day should have only one main attraction, one meal suggestion, and one note for the day.
+4. Keep tips concise.
+5. day_index must range from 1 to {day_count}.
+6. If the additional notes contain explicit requests such as "want to watch the sunset" or "don't want to wake up early", these must be reflected in the days, not just placed in tips.
+7. If a sunset viewing is arranged, that day's spot_name should, as much as possible, be a location suitable for watching the sunset, or stay consistent with the sunset arrangement in daily_note — avoid a complete disconnect between the "main attraction" and the "sunset location".
+8. Each day's schedule should match a "relaxed" pace — avoid overpacking the day or too-early departures.
+9. For meal suggestions, prioritize using specialty dishes/restaurants that already appear in the local guide context.
+10. Return only the JSON object — no additional explanation, and do not use ```json code blocks.
 
-JSON 结构示例：
+Example JSON structure:
 {{
-  "summary": "整体概述",
-  "tips": ["提示1", "提示2"],
+  "summary": "Overall summary",
+  "tips": ["Tip 1", "Tip 2"],
   "days": [
     {{
       "day_index": 1,
-      "theme": "当天主题",
-      "spot_name": "主要景点",
-      "spot_description": "景点推荐理由",
-      "meal_name": "餐饮名称",
-      "meal_notes": "餐饮说明",
-      "daily_note": "当天备注"
+      "theme": "Theme for the day",
+      "spot_name": "Main attraction",
+      "spot_description": "Reason for recommending the attraction",
+      "meal_name": "Meal name",
+      "meal_notes": "Meal notes",
+      "daily_note": "Note for the day"
     }}
   ]
 }}
 """
 
-    print("[trip_planner_agent] 准备调用大模型...")
+    print("[trip_planner_agent] Preparing to call the LLM...")
     print(f"[trip_planner_agent] model = {LLM_MODEL}")
     print(f"[trip_planner_agent] base_url = {LLM_BASE_URL or '<DEFAULT>'}")
     print(f"[trip_planner_agent] timeout = {LLM_TIMEOUT_SECONDS}s")
@@ -230,11 +231,11 @@ JSON 结构示例：
             ]
         )
     except Exception as exc:
-        print(f"[trip_planner_agent] 大模型调用失败: {type(exc).__name__}: {exc}")
+        print(f"[trip_planner_agent] LLM call failed: {type(exc).__name__}: {exc}")
         return None, empty_usage
 
     token_usage = _extract_token_usage(response)
-    print(f"[trip_planner_agent] 大模型调用完成。token: prompt={token_usage['prompt_tokens']}, completion={token_usage['completion_tokens']}")
+    print(f"[trip_planner_agent] LLM call completed. tokens: prompt={token_usage['prompt_tokens']}, completion={token_usage['completion_tokens']}")
 
     raw_text = getattr(response, "content", "")
     if isinstance(raw_text, list):
@@ -245,20 +246,20 @@ JSON 结构示例：
 
     json_text = _extract_json_object(str(raw_text))
     if json_text is None:
-        print("[trip_planner_agent] 未能从模型返回中提取 JSON。")
-        print(f"[trip_planner_agent] 原始返回预览: {str(raw_text)[:300]}")
+        print("[trip_planner_agent] Failed to extract JSON from the model response.")
+        print(f"[trip_planner_agent] Raw response preview: {str(raw_text)[:300]}")
         return None, token_usage
 
     try:
         result = PlannerDraft.model_validate(json.loads(json_text))
     except Exception as exc:
-        print(f"[trip_planner_agent] JSON 解析失败: {type(exc).__name__}: {exc}")
-        print(f"[trip_planner_agent] 原始返回预览: {str(raw_text)[:300]}")
+        print(f"[trip_planner_agent] JSON parsing failed: {type(exc).__name__}: {exc}")
+        print(f"[trip_planner_agent] Raw response preview: {str(raw_text)[:300]}")
         return None, token_usage
 
     if len(result.days) != day_count:
         print(
-            "[trip_planner_agent] 结构化结果天数不匹配，"
+            "[trip_planner_agent] The number of days in the structured result does not match, "
             f"expected={day_count}, actual={len(result.days)}"
         )
         return None, token_usage
@@ -271,10 +272,11 @@ def generate_day_edit_draft(
     target_day: DayPlan,
 ) -> tuple[DayEditDraft | None, dict[str, int]]:
     """
-    使用 LLM 生成单日编辑草稿。返回 (draft, token_usage)。
+    Generate a single-day edit draft using the LLM. Returns (draft, token_usage).
 
-    这个函数只负责产出目标那一天的编辑结果，
-    最终如何合并回完整 itinerary 由 service 层处理。
+    This function is only responsible for producing the edit result for the
+    target day; how it is ultimately merged back into the full itinerary is
+    handled by the service layer.
     """
     empty_usage = {"prompt_tokens": 0, "completion_tokens": 0}
     llm = _build_chat_llm()
@@ -293,42 +295,42 @@ def generate_day_edit_draft(
     current_itinerary_payload = request.current_itinerary.model_dump(mode="json")
 
     system_prompt = (
-        "你是一名旅行行程编辑助手。"
-        "请根据用户编辑指令，只重写目标那一天的核心安排。"
-        "你必须只输出一个 JSON 对象，不要输出 Markdown，不要输出解释文字，不要输出代码块。"
-        "编辑结果要尽量保留原 itinerary 的整体风格、预算结构和轻松程度。"
+        "You are a travel itinerary editing assistant."
+        "Based on the user's edit instruction, rewrite only the core plan for the target day."
+        "You must output only a single JSON object — no Markdown, no explanatory text, no code blocks."
+        "The edited result should preserve, as much as possible, the overall style, budget structure, and relaxed pace of the original itinerary."
     )
 
     human_prompt = f"""
-当前完整 itinerary：
+Current full itinerary:
 {json.dumps(current_itinerary_payload, ensure_ascii=False, indent=2)}
 
-需要重点编辑的目标 day：
+Target day that needs to be edited:
 {json.dumps(current_day_payload, ensure_ascii=False, indent=2)}
 
-用户编辑指令：{request.user_instruction}
-编辑范围：{request.edit_scope or '未指定'}
-需要尽量保留的约束：{', '.join(request.preserve_constraints) if request.preserve_constraints else '无'}
+User edit instruction: {request.user_instruction}
+Edit scope: {request.edit_scope or 'Not specified'}
+Constraints to preserve as much as possible: {', '.join(request.preserve_constraints) if request.preserve_constraints else 'None'}
 
-要求：
-1. 只输出目标那一天编辑后的结果。
-2. 如果用户要求“更轻松”“不要安排太满”，请减少固定景点压力，让备注更自然。
-3. 尽量延续原 itinerary 的城市、风格、餐饮语气和预算结构。
-4. 不要输出额外字段。
-5. 只返回 JSON 对象。
+Requirements:
+1. Output only the edited result for the target day.
+2. If the user asks for "more relaxed" or "don't overpack the schedule", reduce the pressure of fixed attractions and make the notes read more naturally.
+3. Preserve, as much as possible, the original itinerary's city, style, dining tone, and budget structure.
+4. Do not output any extra fields.
+5. Return only the JSON object.
 
-JSON 结构示例：
+Example JSON structure:
 {{
-  "theme": "编辑后的当天主题",
-  "spot_name": "编辑后的主要景点",
-  "spot_description": "编辑后的景点说明",
-  "meal_name": "编辑后的餐饮名称",
-  "meal_notes": "编辑后的餐饮说明",
-  "daily_note": "编辑后的当天备注"
+  "theme": "Edited theme for the day",
+  "spot_name": "Edited main attraction",
+  "spot_description": "Edited attraction description",
+  "meal_name": "Edited meal name",
+  "meal_notes": "Edited meal notes",
+  "daily_note": "Edited note for the day"
 }}
 """
 
-    print("[trip_planner_agent] 准备调用大模型进行单日编辑...")
+    print("[trip_planner_agent] Preparing to call the LLM for a single-day edit...")
     print(f"[trip_planner_agent] model = {LLM_MODEL}")
     print(f"[trip_planner_agent] base_url = {LLM_BASE_URL or '<DEFAULT>'}")
 
@@ -340,11 +342,11 @@ JSON 结构示例：
             ]
         )
     except Exception as exc:
-        print(f"[trip_planner_agent] 单日编辑调用失败: {type(exc).__name__}: {exc}")
+        print(f"[trip_planner_agent] Single-day edit call failed: {type(exc).__name__}: {exc}")
         return None, empty_usage
 
     token_usage = _extract_token_usage(response)
-    print(f"[trip_planner_agent] 单日编辑调用完成。token: prompt={token_usage['prompt_tokens']}, completion={token_usage['completion_tokens']}")
+    print(f"[trip_planner_agent] Single-day edit call completed. tokens: prompt={token_usage['prompt_tokens']}, completion={token_usage['completion_tokens']}")
 
     raw_text = getattr(response, "content", "")
     if isinstance(raw_text, list):
@@ -355,17 +357,17 @@ JSON 结构示例：
 
     json_text = _extract_json_object(str(raw_text))
     if json_text is None:
-        print("[trip_planner_agent] 未能从单日编辑结果中提取 JSON。")
-        print(f"[trip_planner_agent] 原始返回预览: {str(raw_text)[:300]}")
+        print("[trip_planner_agent] Failed to extract JSON from the single-day edit result.")
+        print(f"[trip_planner_agent] Raw response preview: {str(raw_text)[:300]}")
         return None, token_usage
 
     try:
         payload = json.loads(json_text)
         if not isinstance(payload, dict):
-            raise ValueError("单日编辑结果不是 JSON 对象。")
+            raise ValueError("The single-day edit result is not a JSON object.")
         normalized_payload = _normalize_day_edit_payload(payload)
         return DayEditDraft.model_validate(normalized_payload), token_usage
     except Exception as exc:
-        print(f"[trip_planner_agent] 单日编辑 JSON 解析失败: {type(exc).__name__}: {exc}")
-        print(f"[trip_planner_agent] 原始返回预览: {str(raw_text)[:300]}")
+        print(f"[trip_planner_agent] Single-day edit JSON parsing failed: {type(exc).__name__}: {exc}")
+        print(f"[trip_planner_agent] Raw response preview: {str(raw_text)[:300]}")
         return None, token_usage

@@ -14,14 +14,14 @@ from app.models.schemas import (
 
 
 def init_db() -> None:
-    """初始化数据库表结构。"""
+    """Initialize the database table schema."""
     from app.config import Base
 
     Base.metadata.create_all(bind=engine)
 
 
 def save_itinerary(itinerary: Itinerary) -> str:
-    """保存或更新完整 itinerary，并返回 trip_id。"""
+    """Save or update the complete itinerary and return the trip_id."""
     init_db()
 
     session = SessionLocal()
@@ -57,7 +57,7 @@ def save_itinerary(itinerary: Itinerary) -> str:
 
 
 def get_itinerary_by_trip_id(trip_id: str) -> TripDetailResponse | None:
-    """根据 trip_id 读取已保存 itinerary，找不到时返回 None。"""
+    """Read the saved itinerary by trip_id, returning None if not found."""
     init_db()
 
     session = SessionLocal()
@@ -80,7 +80,7 @@ def get_itinerary_by_trip_id(trip_id: str) -> TripDetailResponse | None:
 
 
 def list_saved_itineraries() -> TripListResponse:
-    """返回已保存行程的摘要列表。"""
+    """Return a summary list of saved trips."""
     init_db()
 
     session = SessionLocal()
@@ -107,7 +107,7 @@ def list_saved_itineraries() -> TripListResponse:
 
 
 def get_token_stats() -> TokenStatsResponse:
-    """统计所有已保存行程的 token 消耗。"""
+    """Aggregate token usage across all saved trips."""
     init_db()
 
     session = SessionLocal()
@@ -151,7 +151,7 @@ def get_token_stats() -> TokenStatsResponse:
 
 
 def delete_itinerary_by_trip_id(trip_id: str) -> bool:
-    """根据 trip_id 删除已保存行程，删除成功返回 True。"""
+    """Delete the saved trip by trip_id, returning True on success."""
     init_db()
 
     session = SessionLocal()

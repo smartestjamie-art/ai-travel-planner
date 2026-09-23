@@ -6,128 +6,128 @@ from pydantic import BaseModel, Field
 
 
 class TripRequest(BaseModel):
-    """用于生成新行程的请求体。"""
+    """Request body used to generate a new itinerary."""
 
-    destination: str = Field(..., description="目的地，例如大理")
-    start_date: DateType = Field(..., description="出行开始日期")
-    end_date: DateType = Field(..., description="出行结束日期")
-    travelers: int = Field(..., ge=1, description="出行人数")
-    budget: float = Field(..., ge=0, description="总预算")
-    preferences: list[str] = Field(default_factory=list, description="旅行偏好标签")
-    pace: str | None = Field(default=None, description="旅行节奏，例如轻松、适中、紧凑")
+    destination: str = Field(..., description="Destination, e.g. Dali")
+    start_date: DateType = Field(..., description="Trip start date")
+    end_date: DateType = Field(..., description="Trip end date")
+    travelers: int = Field(..., ge=1, description="Number of travelers")
+    budget: float = Field(..., ge=0, description="Total budget")
+    preferences: list[str] = Field(default_factory=list, description="Travel preference tags")
+    pace: str | None = Field(default=None, description="Travel pace, e.g. relaxed, moderate, packed")
     dietary_preferences: list[str] = Field(
         default_factory=list,
-        description="饮食偏好或忌口",
+        description="Dietary preferences or restrictions",
     )
-    hotel_level: str | None = Field(default=None, description="酒店档次偏好")
-    special_notes: str | None = Field(default=None, description="额外要求")
+    hotel_level: str | None = Field(default=None, description="Preferred hotel tier")
+    special_notes: str | None = Field(default=None, description="Additional requirements")
 
 
 class TripEditRequest(BaseModel):
-    """用于修改已有行程的请求体。"""
+    """Request body used to modify an existing itinerary."""
 
-    trip_id: str = Field(..., description="需要编辑的行程 ID")
-    current_itinerary: "Itinerary" = Field(..., description="当前完整 itinerary")
-    user_instruction: str = Field(..., description="用户新的修改要求")
-    edit_scope: str | None = Field(default=None, description="编辑范围")
+    trip_id: str = Field(..., description="ID of the trip to edit")
+    current_itinerary: "Itinerary" = Field(..., description="The current, complete itinerary")
+    user_instruction: str = Field(..., description="The user's new modification request")
+    edit_scope: str | None = Field(default=None, description="Scope of the edit")
     preserve_constraints: list[str] = Field(
         default_factory=list,
-        description="需要尽量保留的条件",
+        description="Conditions that should be preserved as much as possible",
     )
 
 
 class TripSaveRequest(BaseModel):
-    """用于保存当前 itinerary 的请求体。"""
+    """Request body used to save the current itinerary."""
 
-    trip_id: str = Field(..., description="需要保存的行程 ID")
-    itinerary: "Itinerary" = Field(..., description="完整行程数据")
-    user_id: str | None = Field(default=None, description="用户 ID，当前版本可留空")
+    trip_id: str = Field(..., description="ID of the trip to save")
+    itinerary: "Itinerary" = Field(..., description="Complete itinerary data")
+    user_id: str | None = Field(default=None, description="User ID; may be left empty in the current version")
 
 
 class SpotItem(BaseModel):
-    """单个景点安排。"""
+    """A single attraction arrangement."""
 
-    name: str = Field(..., description="景点名称")
-    start_time: str | None = Field(default=None, description="开始时间")
-    end_time: str | None = Field(default=None, description="结束时间")
-    description: str | None = Field(default=None, description="景点安排说明")
-    estimated_cost: float = Field(default=0.0, ge=0, description="预估花费")
-    location: str | None = Field(default=None, description="景点位置描述")
-    image_url: str | None = Field(default=None, description="景点图片地址")
-    address: str | None = Field(default=None, description="景点详细地址")
-    latitude: float | None = Field(default=None, description="景点纬度")
-    longitude: float | None = Field(default=None, description="景点经度")
-    poi_id: str | None = Field(default=None, description="地图服务返回的 POI 标识")
+    name: str = Field(..., description="Attraction name")
+    start_time: str | None = Field(default=None, description="Start time")
+    end_time: str | None = Field(default=None, description="End time")
+    description: str | None = Field(default=None, description="Description of the visit")
+    estimated_cost: float = Field(default=0.0, ge=0, description="Estimated cost")
+    location: str | None = Field(default=None, description="Description of the attraction's location")
+    image_url: str | None = Field(default=None, description="URL of the attraction's image")
+    address: str | None = Field(default=None, description="Detailed address of the attraction")
+    latitude: float | None = Field(default=None, description="Latitude of the attraction")
+    longitude: float | None = Field(default=None, description="Longitude of the attraction")
+    poi_id: str | None = Field(default=None, description="POI identifier returned by the map service")
 
 
 class MealItem(BaseModel):
-    """单个餐饮安排。"""
+    """A single meal arrangement."""
 
-    name: str = Field(..., description="餐厅或餐饮建议名称")
-    meal_type: str = Field(..., description="早餐、午餐、晚餐等")
-    estimated_cost: float = Field(default=0.0, ge=0, description="预估花费")
-    notes: str | None = Field(default=None, description="补充说明")
+    name: str = Field(..., description="Name of the restaurant or meal suggestion")
+    meal_type: str = Field(..., description="Breakfast, lunch, dinner, etc.")
+    estimated_cost: float = Field(default=0.0, ge=0, description="Estimated cost")
+    notes: str | None = Field(default=None, description="Additional notes")
 
 
 class HotelItem(BaseModel):
-    """单个住宿安排。"""
+    """A single lodging arrangement."""
 
-    name: str = Field(..., description="酒店名称")
-    level: str | None = Field(default=None, description="酒店档次")
-    estimated_cost: float = Field(default=0.0, ge=0, description="预估花费")
-    location: str | None = Field(default=None, description="酒店位置")
-    address: str | None = Field(default=None, description="酒店详细地址")
-    latitude: float | None = Field(default=None, description="酒店纬度")
-    longitude: float | None = Field(default=None, description="酒店经度")
+    name: str = Field(..., description="Hotel name")
+    level: str | None = Field(default=None, description="Hotel tier")
+    estimated_cost: float = Field(default=0.0, ge=0, description="Estimated cost")
+    location: str | None = Field(default=None, description="Hotel location")
+    address: str | None = Field(default=None, description="Detailed address of the hotel")
+    latitude: float | None = Field(default=None, description="Latitude of the hotel")
+    longitude: float | None = Field(default=None, description="Longitude of the hotel")
 
 
 class TransportItem(BaseModel):
-    """单段交通安排。"""
+    """A single leg of transportation."""
 
-    mode: str = Field(..., description="交通方式，例如步行、打车、公交")
-    from_place: str | None = Field(default=None, description="出发地")
-    to_place: str | None = Field(default=None, description="目的地")
-    estimated_cost: float = Field(default=0.0, ge=0, description="预估花费")
-    duration: str | None = Field(default=None, description="预计耗时")
-    distance_km: float | None = Field(default=None, ge=0, description="预计距离，单位公里")
-    estimated_minutes: int | None = Field(default=None, ge=0, description="预计耗时，单位分钟")
+    mode: str = Field(..., description="Mode of transport, e.g. walking, taxi, bus")
+    from_place: str | None = Field(default=None, description="Departure location")
+    to_place: str | None = Field(default=None, description="Destination")
+    estimated_cost: float = Field(default=0.0, ge=0, description="Estimated cost")
+    duration: str | None = Field(default=None, description="Estimated duration")
+    distance_km: float | None = Field(default=None, ge=0, description="Estimated distance, in kilometers")
+    estimated_minutes: int | None = Field(default=None, ge=0, description="Estimated duration, in minutes")
 
 
 class BudgetBreakdown(BaseModel):
-    """预算拆分。"""
+    """Budget breakdown."""
 
-    transport: float = Field(default=0.0, ge=0, description="交通预算")
-    hotel: float = Field(default=0.0, ge=0, description="住宿预算")
-    meals: float = Field(default=0.0, ge=0, description="餐饮预算")
-    tickets: float = Field(default=0.0, ge=0, description="门票预算")
-    other: float = Field(default=0.0, ge=0, description="其他预算")
-    total: float = Field(default=0.0, ge=0, description="预算总计")
+    transport: float = Field(default=0.0, ge=0, description="Transportation budget")
+    hotel: float = Field(default=0.0, ge=0, description="Lodging budget")
+    meals: float = Field(default=0.0, ge=0, description="Dining budget")
+    tickets: float = Field(default=0.0, ge=0, description="Admission tickets budget")
+    other: float = Field(default=0.0, ge=0, description="Other budget")
+    total: float = Field(default=0.0, ge=0, description="Total budget")
 
 
 class DayPlan(BaseModel):
-    """单日行程安排。"""
+    """Itinerary plan for a single day."""
 
-    day_index: int = Field(..., ge=1, description="第几天")
-    date: DateType | None = Field(default=None, description="当天日期")
-    theme: str | None = Field(default=None, description="当天主题")
-    spots: list[SpotItem] = Field(default_factory=list, description="景点安排")
-    meals: list[MealItem] = Field(default_factory=list, description="餐饮安排")
-    hotel: HotelItem | None = Field(default=None, description="住宿安排")
-    transport: list[TransportItem] = Field(default_factory=list, description="交通安排")
-    notes: list[str] = Field(default_factory=list, description="补充说明")
+    day_index: int = Field(..., ge=1, description="Day number")
+    date: DateType | None = Field(default=None, description="Date of the day")
+    theme: str | None = Field(default=None, description="Theme for the day")
+    spots: list[SpotItem] = Field(default_factory=list, description="Attraction arrangements")
+    meals: list[MealItem] = Field(default_factory=list, description="Meal arrangements")
+    hotel: HotelItem | None = Field(default=None, description="Lodging arrangement")
+    transport: list[TransportItem] = Field(default_factory=list, description="Transportation arrangements")
+    notes: list[str] = Field(default_factory=list, description="Additional notes")
 
 
 class TokenUsage(BaseModel):
-    """LLM 调用的 token 消耗统计。"""
+    """Token consumption statistics for LLM calls."""
 
-    rewrite_prompt_tokens: int = Field(default=0, ge=0, description="Query Rewrite 输入 token")
-    rewrite_completion_tokens: int = Field(default=0, ge=0, description="Query Rewrite 输出 token")
-    embedding_prompt_tokens: int = Field(default=0, ge=0, description="Query Embedding 输入 token")
-    embedding_completion_tokens: int = Field(default=0, ge=0, description="Query Embedding 输出 token")
-    planner_prompt_tokens: int = Field(default=0, ge=0, description="行程生成输入 token")
-    planner_completion_tokens: int = Field(default=0, ge=0, description="行程生成输出 token")
-    rerank_prompt_tokens: int = Field(default=0, ge=0, description="Rerank 输入 token")
-    rerank_completion_tokens: int = Field(default=0, ge=0, description="Rerank 输出 token")
+    rewrite_prompt_tokens: int = Field(default=0, ge=0, description="Query Rewrite input tokens")
+    rewrite_completion_tokens: int = Field(default=0, ge=0, description="Query Rewrite output tokens")
+    embedding_prompt_tokens: int = Field(default=0, ge=0, description="Query Embedding input tokens")
+    embedding_completion_tokens: int = Field(default=0, ge=0, description="Query Embedding output tokens")
+    planner_prompt_tokens: int = Field(default=0, ge=0, description="Itinerary generation input tokens")
+    planner_completion_tokens: int = Field(default=0, ge=0, description="Itinerary generation output tokens")
+    rerank_prompt_tokens: int = Field(default=0, ge=0, description="Rerank input tokens")
+    rerank_completion_tokens: int = Field(default=0, ge=0, description="Rerank output tokens")
 
     @property
     def total_prompt_tokens(self) -> int:
@@ -153,61 +153,61 @@ class TokenUsage(BaseModel):
 
 
 class Itinerary(BaseModel):
-    """完整行程。"""
+    """A complete itinerary."""
 
-    trip_id: str = Field(..., description="行程唯一标识")
-    destination: str = Field(..., description="目的地")
-    summary: str = Field(..., description="整趟行程的概述")
-    days: list[DayPlan] = Field(default_factory=list, description="逐日行程")
-    estimated_budget: float = Field(default=0.0, ge=0, description="预算总计")
-    budget_breakdown: BudgetBreakdown = Field(..., description="预算明细")
-    tips: list[str] = Field(default_factory=list, description="旅行建议")
+    trip_id: str = Field(..., description="Unique identifier for the trip")
+    destination: str = Field(..., description="Destination")
+    summary: str = Field(..., description="Summary of the entire trip")
+    days: list[DayPlan] = Field(default_factory=list, description="Day-by-day itinerary")
+    estimated_budget: float = Field(default=0.0, ge=0, description="Total budget")
+    budget_breakdown: BudgetBreakdown = Field(..., description="Budget breakdown")
+    tips: list[str] = Field(default_factory=list, description="Travel tips")
     source_notes: list[str] = Field(
         default_factory=list,
-        description="RAG 或规则生成产生的补充说明",
+        description="Additional notes produced by RAG or rule-based generation",
     )
-    token_usage: TokenUsage | None = Field(default=None, description="LLM token 消耗统计")
+    token_usage: TokenUsage | None = Field(default=None, description="LLM token consumption statistics")
 
 
 class TripDetailResponse(BaseModel):
-    """查询已保存行程时返回的响应体。"""
+    """Response body returned when querying a saved itinerary."""
 
-    trip_id: str = Field(..., description="行程 ID")
-    itinerary: Itinerary = Field(..., description="已保存的完整行程")
-    created_at: datetime | None = Field(default=None, description="创建时间")
-    updated_at: datetime | None = Field(default=None, description="更新时间")
+    trip_id: str = Field(..., description="Trip ID")
+    itinerary: Itinerary = Field(..., description="The saved, complete itinerary")
+    created_at: datetime | None = Field(default=None, description="Creation time")
+    updated_at: datetime | None = Field(default=None, description="Last update time")
 
 
 class TripSummaryItem(BaseModel):
-    """已保存行程的摘要信息。"""
+    """Summary information for a saved itinerary."""
 
-    trip_id: str = Field(..., description="行程 ID")
-    destination: str = Field(..., description="目的地")
-    summary: str = Field(..., description="行程概述")
-    created_at: datetime | None = Field(default=None, description="创建时间")
-    updated_at: datetime | None = Field(default=None, description="更新时间")
+    trip_id: str = Field(..., description="Trip ID")
+    destination: str = Field(..., description="Destination")
+    summary: str = Field(..., description="Itinerary summary")
+    created_at: datetime | None = Field(default=None, description="Creation time")
+    updated_at: datetime | None = Field(default=None, description="Last update time")
 
 
 class TripListResponse(BaseModel):
-    """行程列表接口的响应结构。"""
+    """Response structure for the trip list endpoint."""
 
-    total: int = Field(..., ge=0, description="列表总数")
-    items: list[TripSummaryItem] = Field(default_factory=list, description="行程摘要列表")
+    total: int = Field(..., ge=0, description="Total number of items in the list")
+    items: list[TripSummaryItem] = Field(default_factory=list, description="List of trip summaries")
 
 
 class TripTokenStatsItem(BaseModel):
-    """单个行程的 token 消耗。"""
+    """Token consumption for a single trip."""
 
-    trip_id: str = Field(..., description="行程 ID")
-    destination: str = Field(..., description="目的地")
-    token_usage: TokenUsage = Field(..., description="token 消耗")
+    trip_id: str = Field(..., description="Trip ID")
+    destination: str = Field(..., description="Destination")
+    token_usage: TokenUsage = Field(..., description="Token consumption")
 
 
 class TokenStatsResponse(BaseModel):
-    """Token 消耗统计接口的响应结构。"""
+    """Response structure for the token consumption statistics endpoint."""
 
-    trip_count: int = Field(..., ge=0, description="统计行程数")
-    total_prompt_tokens: int = Field(default=0, ge=0, description="总输入 token")
-    total_completion_tokens: int = Field(default=0, ge=0, description="总输出 token")
-    total_tokens: int = Field(default=0, ge=0, description="总 token")
-    items: list[TripTokenStatsItem] = Field(default_factory=list, description="各行程 token 明细")
+    trip_count: int = Field(..., ge=0, description="Number of trips included in the statistics")
+    total_prompt_tokens: int = Field(default=0, ge=0, description="Total input tokens")
+    total_completion_tokens: int = Field(default=0, ge=0, description="Total output tokens")
+    total_tokens: int = Field(default=0, ge=0, description="Total tokens")
+    items: list[TripTokenStatsItem] = Field(default_factory=list, description="Per-trip token breakdown")

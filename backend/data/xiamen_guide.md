@@ -1,67 +1,67 @@
-# 2026 厦门深度游玩全攻略
+# 2026 Complete Xiamen Travel Guide
 
-## 1. 目的地简介
-厦门位于福建省东南沿海，是一座风光秀丽的海滨城市。这里有文艺清新的鼓浪屿、热闹的中山路骑楼、安静的环岛路和充满闽南风情的南普陀寺。厦门气候温暖，四季适合旅行，尤以春秋两季最舒适。适合文艺青年、情侣度假、亲子休闲和美食爱好者。
+## 1. Destination Overview
+Xiamen sits on the southeastern coast of Fujian Province and is a scenic seaside city. Highlights include the artsy, laid-back Gulangyu Island, the bustling arcaded shops of Zhongshan Road, the tranquil Island Ring Road, and Nanputuo Temple with its strong Minnan (southern Fujian) character. Xiamen has a mild climate suited to travel year-round, with spring and autumn being the most pleasant. It's great for creative types, couples on holiday, families, and food lovers.
 
-## 2. 核心景点推荐 (含门票与位置信息)
+## 2. Top Attractions (with Admission and Location Info)
 
-### 2.1 鼓浪屿
-* **位置**：厦门市思明区（需乘渡轮前往，从厦门国际邮轮中心出发）
-* **门票**：渡轮 35元/人（往返）；岛上部分景点另收费
-* **游玩时长**：1天
-* **简介**：世界文化遗产，被称为"万国建筑博览馆"。岛上有日光岩、菽庄花园、皓月园等景点，还有各种文艺小店和咖啡馆。建议至少留一整天，早上上岛避开人流。注意：旺季需提前预约渡轮。
+### 2.1 Gulangyu Island
+* **Location**: Siming District, Xiamen (reached by ferry from the Xiamen International Cruise Terminal)
+* **Admission**: Ferry 35 yuan/person (round trip); some attractions on the island charge separately
+* **Suggested Duration**: A full day
+* **Overview**: A UNESCO World Heritage Site known as the "museum of world architecture." The island features sights like Sunlight Rock, Shuzhuang Garden, and Haoyue Park, plus plenty of artsy boutiques and cafés. Plan to spend at least a full day, and arrive early to beat the crowds. Note: book ferry tickets in advance during peak season.
 
-### 2.2 南普陀寺
-* **位置**：厦门市思明区思明南路 515 号
-* **门票**：免费
-* **游玩时长**：2-3小时
-* **简介**：闽南佛教圣地，始建于唐代，依山面海，气势宏伟。寺后的五老峰可以俯瞰厦门大学和大海，是拍照好去处。寺内素斋远近闻名。
+### 2.2 Nanputuo Temple
+* **Location**: 515 Siming South Road, Siming District, Xiamen
+* **Admission**: Free
+* **Suggested Duration**: 2-3 hours
+* **Overview**: A sacred site of Minnan Buddhism first built in the Tang dynasty, set against the mountains and facing the sea with an imposing presence. Wulao Peak behind the temple offers views over Xiamen University and the ocean, making it a great photo spot. The temple's vegetarian cuisine is well known far and wide.
 
-### 2.3 厦门大学
-* **位置**：厦门市思明区思明南路 422 号
-* **门票**：免费（需提前预约）
-* **游玩时长**：2-3小时
-* **简介**：被誉为"中国最美大学"之一，校园内嘉庚风格建筑与南洋风情相得益彰。芙蓉湖、芙蓉隧道（涂鸦隧道）是必打卡点。注意：限流参观，建议提前在公众号预约。
+### 2.3 Xiamen University
+* **Location**: 422 Siming South Road, Siming District, Xiamen
+* **Admission**: Free (advance reservation required)
+* **Suggested Duration**: 2-3 hours
+* **Overview**: Often called one of "China's most beautiful universities," where Jiageng-style architecture blends beautifully with Nanyang (Southeast Asian) influences. Furong Lake and Furong Tunnel (the graffiti tunnel) are must-see spots. Note: visitor numbers are capped, so reserve a slot through the official WeChat account in advance.
 
-### 2.4 环岛路
-* **位置**：厦门市思明区沿海岸线
-* **门票**：免费
-* **游玩时长**：半天
-* **简介**：沿海修建的景观大道，全程约 31 公里。可以租自行车骑行，沿途经过白城沙滩、胡里山炮台、曾厝垵等景点。傍晚骑行看日落是经典体验。
+### 2.4 Island Ring Road
+* **Location**: Along the coastline, Siming District, Xiamen
+* **Admission**: Free
+* **Suggested Duration**: Half a day
+* **Overview**: A scenic coastal road roughly 31 kilometers long. Rent a bike and ride past Baicheng Beach, Hulishan Fortress, and Zengcuoan along the way. Cycling at dusk to watch the sunset is a classic experience here.
 
-### 2.5 曾厝垵
-* **位置**：厦门市思明区曾厝垵路
-* **门票**：免费
-* **游玩时长**：2-3小时
-* **简介**：从渔村转型的文艺聚落，遍布民宿、咖啡馆、小吃店和手工艺品店。白天适合闲逛拍照，夜晚灯火通明更有氛围。沙茶面、海蛎煎、土笋冻等闽南小吃集中在这一带。
+### 2.5 Zengcuoan
+* **Location**: Zengcuoan Road, Siming District, Xiamen
+* **Admission**: Free
+* **Suggested Duration**: 2-3 hours
+* **Overview**: A former fishing village turned artsy enclave, packed with guesthouses, cafés, snack stalls, and craft shops. It's great for strolling and photos by day, and the lit-up streets have real atmosphere at night. Local Minnan snacks like sha cha noodles, oyster omelets, and sea worm jelly are concentrated in this area.
 
-## 3. 特色餐饮与预算参考
+## 3. Local Food and Budget Guide
 
-* **沙茶面**：厦门最具代表性的面食，沙茶汤底配各种海鲜和内脏，人均预算 **15-25元**。
-* **海蛎煎**：闽南经典小吃，鸡蛋裹海蛎煎制，人均预算 **15-20元**。
-* **土笋冻**：厦门特色冷食，用沙虫熬制的透明果冻，人均预算 **10-15元**。
-* **姜母鸭**：闽南传统名菜，姜味浓郁，人均预算 **50-80元**。
-* **花生汤**：甜品小吃，花生酥烂入口即化，人均预算 **8-12元**。
-* **烧肉粽**：闽南肉粽，料足味重，人均预算 **10-15元**。
+* **Sha Cha Noodles**: Xiamen's signature noodle dish, served in a sha cha (satay-style) broth with seafood and offal; budget **15-25 yuan per person**.
+* **Oyster Omelet**: A classic Minnan snack of egg-battered fried oysters; budget **15-20 yuan per person**.
+* **Sea Worm Jelly**: A Xiamen specialty cold dish — a translucent jelly made by simmering sipunculid worms; budget **10-15 yuan per person**.
+* **Ginger Duck**: A traditional Minnan dish with a bold ginger flavor; budget **50-80 yuan per person**.
+* **Peanut Soup**: A sweet snack with peanuts cooked soft enough to melt in your mouth; budget **8-12 yuan per person**.
+* **Braised Meat Rice Dumplings**: Minnan-style rice dumplings packed with hearty fillings; budget **10-15 yuan per person**.
 
-## 4. 住宿区域建议
+## 4. Where to Stay
 
-* **中山路/轮渡周边**：靠近鼓浪屿渡轮码头和中山路步行街，交通便利。酒店预算：**300-600元/晚**。
-* **曾厝垵**：文艺民宿聚集地，适合喜欢特色住宿的游客。民宿预算：**200-500元/晚**。
-* **厦门大学/南普陀周边**：文化氛围浓厚，步行可达多个景点。酒店预算：**250-500元/晚**。
-* **环岛路沿线**：海景房集中区，适合度假放松。酒店预算：**400-800元/晚**。
+* **Zhongshan Road / Ferry Terminal Area**: Close to the Gulangyu ferry pier and the Zhongshan Road pedestrian street, with convenient transport. Hotel budget: **300-600 yuan/night**.
+* **Zengcuoan**: A hub of artsy guesthouses, good for travelers who like distinctive lodging. Guesthouse budget: **200-500 yuan/night**.
+* **Xiamen University / Nanputuo Temple Area**: Rich in cultural atmosphere, with several attractions within walking distance. Hotel budget: **250-500 yuan/night**.
+* **Island Ring Road**: A cluster of sea-view rooms, ideal for a relaxing getaway. Hotel budget: **400-800 yuan/night**.
 
-## 5. 经典三日行程参考 (Agent 提取样本)
+## 5. Sample Classic 3-Day Itinerary (Agent Extraction Sample)
 
-* **第一天：鼓浪屿慢时光**
-  * 上午：乘渡轮前往【鼓浪屿】，登日光岩俯瞰全岛。
-  * 下午：游览菽庄花园、钢琴博物馆，漫步小巷感受文艺气息。
-  * 晚上：在岛上品尝馅饼和奶茶，看夜景后返回。
-* **第二天：文化与海滨**
-  * 上午：参观【南普陀寺】，品尝寺内素斋，登五老峰俯瞰海景。
-  * 下午：游览【厦门大学】，打卡芙蓉隧道涂鸦墙。
-  * 晚上：在中山路步行街逛街，品尝沙茶面和海蛎煎。
-* **第三天：环岛骑行与渔村**
-  * 上午：在【环岛路】租自行车骑行，经过白城沙滩和胡里山炮台。
-  * 下午：前往【曾厝垵】，逛文艺小店，品尝闽南小吃。
-  * 晚上：在环岛路海滩看日落，结束行程。
+* **Day 1: Slow Time on Gulangyu**
+  * Morning: Take the ferry to **Gulangyu Island** and climb Sunlight Rock for a view over the whole island.
+  * Afternoon: Visit Shuzhuang Garden and the Piano Museum, then wander the lanes for an artsy vibe.
+  * Evening: Try local pastries and milk tea on the island, watch the night view, then head back.
+* **Day 2: Culture and Coastline**
+  * Morning: Visit **Nanputuo Temple**, try the temple's vegetarian food, and climb Wulao Peak for sea views.
+  * Afternoon: Tour **Xiamen University** and check out the graffiti art at Furong Tunnel.
+  * Evening: Stroll the Zhongshan Road pedestrian street and try sha cha noodles and oyster omelets.
+* **Day 3: Coastal Cycling and the Old Fishing Village**
+  * Morning: Rent a bike on the **Island Ring Road** and ride past Baicheng Beach and Hulishan Fortress.
+  * Afternoon: Head to **Zengcuoan** to browse artsy shops and sample Minnan snacks.
+  * Evening: Watch the sunset on the beach along the Island Ring Road to close out the trip.

@@ -26,67 +26,67 @@ from app.models.schemas import (  # noqa: E402
 
 
 def build_trip_request() -> TripRequest:
-    '''构建一个示例 TripRequest 对象，用于测试'''
+    '''Build a sample TripRequest object for testing'''
     return TripRequest(
-        destination="大理",
+        destination="Dali",
         start_date="2026-04-10",
         end_date="2026-04-12",
         travelers=2,
         budget=3200,
-        preferences=["自然风景", "拍照", "美食"],
-        pace="轻松",
-        dietary_preferences=["少辣"],
-        hotel_level="舒适型",
-        special_notes="不想太早起床，希望能安排看日落。",
+        preferences=["natural scenery", "photography", "food"],
+        pace="relaxed",
+        dietary_preferences=["mild spice"],
+        hotel_level="comfort",
+        special_notes="Don't want to get up too early, hope to see a sunset.",
     )
 
 
 def build_itinerary() -> Itinerary:
-    '''构建一个示例 Itinerary 对象，用于测试'''
+    '''Build a sample Itinerary object for testing'''
     day_one = DayPlan(
         day_index=1,
         date="2026-04-10",
-        theme="古城慢游",
+        theme="Leisurely stroll through the old town",
         spots=[
             SpotItem(
-                name="大理古城",
+                name="Dali Old Town",
                 start_time="10:00",
                 end_time="12:00",
-                description="先在古城慢慢逛，适应旅行节奏。",
+                description="Start with a slow walk through the old town to settle into the trip's pace.",
                 estimated_cost=0,
-                location="大理古城",
+                location="Dali Old Town",
             )
         ],
         meals=[
             MealItem(
-                name="古城米线店",
-                meal_type="午餐",
+                name="Old Town Rice Noodle Shop",
+                meal_type="lunch",
                 estimated_cost=60,
-                notes="口味可选清淡。",
+                notes="Mild flavor available on request.",
             )
         ],
         hotel=HotelItem(
-            name="古城舒适型民宿",
-            level="舒适型",
+            name="Old Town Comfort Guesthouse",
+            level="comfort",
             estimated_cost=280,
-            location="大理古城附近",
+            location="Near Dali Old Town",
         ),
         transport=[
             TransportItem(
-                mode="打车",
-                from_place="大理站",
-                to_place="大理古城",
+                mode="taxi",
+                from_place="Dali Station",
+                to_place="Dali Old Town",
                 estimated_cost=35,
-                duration="40 分钟",
+                duration="40 minutes",
             )
         ],
-        notes=["第一天尽量轻松，不安排太赶。"],
+        notes=["Keep the first day relaxed and not too rushed."],
     )
 
     return Itinerary(
         trip_id="trip_dali_demo_001",
-        destination="大理",
-        summary="适合两人轻松游玩的 3 日行程示例。",
+        destination="Dali",
+        summary="A sample 3-day itinerary suited for a relaxed trip for two.",
         days=[day_one],
         estimated_budget=1550,
         budget_breakdown=BudgetBreakdown(
@@ -97,26 +97,26 @@ def build_itinerary() -> Itinerary:
             other=275,
             total=1550,
         ),
-        tips=["早晚温差较大，建议带薄外套。"],
-        source_notes=["该结果目前是 Day 2 的手工演示数据。"],
+        tips=["Large temperature swings between morning/night; bring a light jacket."],
+        source_notes=["This result is currently manually crafted demo data for Day 2."],
     )
 
 
 def test_trip_request_can_be_created_successfully() -> None:
-    '''测试 TripRequest 模型能否成功创建'''
+    '''Test whether the TripRequest model can be created successfully'''
     request = build_trip_request()
 
-    assert request.destination == "大理"
+    assert request.destination == "Dali"
     assert request.travelers == 2
     assert request.budget == 3200
-    assert request.preferences == ["自然风景", "拍照", "美食"]
+    assert request.preferences == ["natural scenery", "photography", "food"]
 
 
 def test_trip_request_rejects_invalid_travelers() -> None:
-    '''测试 TripRequest 模型在 travelers 字段为 0 时会抛出 ValidationError'''
+    '''Test that TripRequest raises ValidationError when travelers is 0'''
     with pytest.raises(ValidationError):
         TripRequest(
-            destination="大理",
+            destination="Dali",
             start_date="2026-04-10",
             end_date="2026-04-12",
             travelers=0,
@@ -125,10 +125,10 @@ def test_trip_request_rejects_invalid_travelers() -> None:
 
 
 def test_trip_request_rejects_negative_budget() -> None:
-    '''测试 TripRequest 模型在 budget 字段为负数时会抛出 ValidationError'''
+    '''Test that TripRequest raises ValidationError when budget is negative'''
     with pytest.raises(ValidationError):
         TripRequest(
-            destination="大理",
+            destination="Dali",
             start_date="2026-04-10",
             end_date="2026-04-12",
             travelers=2,
@@ -137,18 +137,18 @@ def test_trip_request_rejects_negative_budget() -> None:
 
 
 def test_itinerary_can_be_created_successfully() -> None:
-    '''测试 Itinerary 模型能否成功创建'''
+    '''Test whether the Itinerary model can be created successfully'''
     itinerary = build_itinerary()
 
     assert itinerary.trip_id == "trip_dali_demo_001"
-    assert itinerary.destination == "大理"
+    assert itinerary.destination == "Dali"
     assert len(itinerary.days) == 1
-    assert itinerary.days[0].theme == "古城慢游"
+    assert itinerary.days[0].theme == "Leisurely stroll through the old town"
     assert itinerary.budget_breakdown.total == 1550
 
 
 def test_day_plan_contains_nested_objects() -> None:
-    '''测试 DayPlan 模型中的嵌套对象是否正确创建'''
+    '''Test whether nested objects within the DayPlan model are created correctly'''
     itinerary = build_itinerary()
     first_day = itinerary.days[0]
 
@@ -159,24 +159,24 @@ def test_day_plan_contains_nested_objects() -> None:
 
 
 def test_trip_edit_request_can_wrap_existing_itinerary() -> None:
-    '''测试 TripEditRequest 模型能否正确包装一个已存在的 Itinerary'''
+    '''Test whether the TripEditRequest model can correctly wrap an existing Itinerary'''
     itinerary = build_itinerary()
 
     edit_request = TripEditRequest(
         trip_id=itinerary.trip_id,
         current_itinerary=itinerary,
-        user_instruction="第二天改轻松一点",
+        user_instruction="Make day 2 more relaxed",
         edit_scope="day_2",
-        preserve_constraints=["保留轻松节奏"],
+        preserve_constraints=["keep a relaxed pace"],
     )
 
     assert edit_request.trip_id == "trip_dali_demo_001"
-    assert edit_request.current_itinerary.destination == "大理"
-    assert edit_request.user_instruction == "第二天改轻松一点"
+    assert edit_request.current_itinerary.destination == "Dali"
+    assert edit_request.user_instruction == "Make day 2 more relaxed"
 
 
 def test_trip_save_request_can_hold_full_itinerary() -> None:
-    '''测试 TripSaveRequest 模型能否正确持有一个完整的 Itinerary'''
+    '''Test whether the TripSaveRequest model can correctly hold a complete Itinerary'''
     itinerary = build_itinerary()
 
     save_request = TripSaveRequest(
@@ -186,5 +186,5 @@ def test_trip_save_request_can_hold_full_itinerary() -> None:
     )
 
     assert save_request.trip_id == "trip_dali_demo_001"
-    assert save_request.itinerary.summary == "适合两人轻松游玩的 3 日行程示例。"
+    assert save_request.itinerary.summary == "A sample 3-day itinerary suited for a relaxed trip for two."
     assert save_request.user_id == "user_001"

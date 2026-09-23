@@ -1,20 +1,20 @@
-# Frontend 开发说明
+# Frontend Development Notes
 
-当前 `frontend/` 是 TripPlannerDemo 的前端项目，使用 `Vue 3 + TypeScript + Vite + Ant Design Vue + Axios`。它已经不再只是骨架页，而是可以和后端完成生成、保存、历史、地图、天气、编辑和导出的完整联调。
+`frontend/` is currently the frontend project for TripPlannerDemo, built with `Vue 3 + TypeScript + Vite + Ant Design Vue + Axios`. It is no longer just a skeleton page — it now works end-to-end with the backend for generation, saving, history, maps, weather, editing, and export.
 
-## 1. 当前能力
+## 1. Current Capabilities
 
-- 规划页：填写目的地、日期、人数、预算、偏好和备注，调用 `/trip/generate`
-- 结果页：展示行程概览、预算明细、按天花费、地图、天气、点位图片和每日安排
-- 保存：调用 `/trip/save`
-- 历史列表：调用 `/trip` 和 `/trip/{trip_id}`
-- 删除历史行程：调用 `DELETE /trip/{trip_id}`
-- 智能调整：调用 `/trip/edit`
-- 导出：支持 PDF / Markdown，导出前会先保存当前页面数据
-- 地图：接入高德 JavaScript API
-- 天气：展示后端 `/weather/forecast` 返回的天气预报
+- Planning page: fill in destination, dates, number of travelers, budget, preferences, and notes, then calls `/trip/generate`
+- Result page: displays the itinerary overview, budget breakdown, daily spending, map, weather, location photos, and the daily schedule
+- Save: calls `/trip/save`
+- History list: calls `/trip` and `/trip/{trip_id}`
+- Delete a saved trip: calls `DELETE /trip/{trip_id}`
+- Smart adjustment: calls `/trip/edit`
+- Export: supports PDF / Markdown, saving the current page data before exporting
+- Map: integrates the Amap (Gaode) JavaScript API
+- Weather: displays the weather forecast returned by the backend's `/weather/forecast`
 
-## 2. 目录结构
+## 2. Directory Structure
 
 ```text
 frontend/
@@ -38,38 +38,38 @@ frontend/
 └── vite.config.ts
 ```
 
-## 3. 环境变量
+## 3. Environment Variables
 
-在服务器的 `frontend/` 目录下创建 `.env`：
+Create a `.env` file under the `frontend/` directory on the server:
 
 ```env
-VITE_API_BASE_URL=http://你的服务器地址:8000
-VITE_AMAP_JS_KEY=你的高德 JavaScript API key
+VITE_API_BASE_URL=http://your-server-address:8000
+VITE_AMAP_JS_KEY=your Amap JavaScript API key
 ```
 
-注意：
+Notes:
 
-- 如果浏览器是在你自己的电脑打开，`VITE_API_BASE_URL` 不要写服务器内部的 `127.0.0.1`
-- 高德前端地图需要 JavaScript API key，不是后端 Web 服务 key
-- 修改 `.env` 后需要重启 `npm run dev`
+- If you're opening the browser on your own computer, don't set `VITE_API_BASE_URL` to the server's internal `127.0.0.1`
+- The Amap frontend map requires a JavaScript API key, not the backend Web service key
+- After changing `.env`, restart `npm run dev`
 
-## 4. 启动方式
+## 4. How to Start
 
-### 安装依赖
+### Install dependencies
 
 ```bash
 cd ~/autodl-tmp/TripPlannerDemo/frontend
 npm install
 ```
 
-### 启动开发服务
+### Start the dev server
 
 ```bash
 cd ~/autodl-tmp/TripPlannerDemo/frontend
 npm run dev
 ```
 
-当前 `vite.config.ts` 已配置：
+`vite.config.ts` is currently configured as:
 
 ```ts
 server: {
@@ -78,77 +78,77 @@ server: {
 }
 ```
 
-浏览器访问：
+Access it in your browser at:
 
 ```text
-http://你的服务器地址:5173
+http://your-server-address:5173
 ```
 
-## 5. 后端联调前提
+## 5. Prerequisites for Backend Integration
 
-前端运行前，后端需要先启动：
+Before running the frontend, the backend needs to be started first:
 
 ```bash
 cd ~/autodl-tmp/TripPlannerDemo/backend
 uvicorn app.api.main:app --host 0.0.0.0 --port 8000
 ```
 
-浏览器能访问下面地址时，再打开前端：
+Once your browser can reach the following addresses, open the frontend:
 
 ```text
-http://你的服务器地址:8000/
-http://你的服务器地址:8000/docs
+http://your-server-address:8000/
+http://your-server-address:8000/docs
 ```
 
-## 6. 常见问题
+## 6. Common Issues
 
-### 页面能打开，但生成行程失败
+### Page loads, but generating an itinerary fails
 
-优先检查：
+Check the following first:
 
-- 后端 `8000` 是否启动
-- `frontend/.env` 的 `VITE_API_BASE_URL` 是否正确
-- 修改 `.env` 后是否重启了前端
-- 浏览器控制台是否有 CORS 或网络请求错误
+- Whether the backend on port `8000` is running
+- Whether `VITE_API_BASE_URL` in `frontend/.env` is correct
+- Whether the frontend was restarted after changing `.env`
+- Whether the browser console shows any CORS or network request errors
 
-### 地图不显示
+### Map doesn't display
 
-优先检查：
+Check the following first:
 
-- `VITE_AMAP_JS_KEY` 是否填写
-- 这个 key 是否是高德 JavaScript API key
-- itinerary 里是否已经有 `latitude` / `longitude`
+- Whether `VITE_AMAP_JS_KEY` is filled in
+- Whether this key is actually an Amap JavaScript API key
+- Whether the itinerary already contains `latitude` / `longitude`
 
-### 导出 PDF 打开空白页
+### Exported PDF opens as a blank page
 
-正常情况下后端应该看到：
+Under normal conditions, the backend should show:
 
 ```text
 POST /trip/save
 GET /export/{trip_id}/pdf
 ```
 
-如果只看到 `POST /trip/save`，说明前端没有跳转到导出地址，先确认前端代码已经更新并重启。
+If you only see `POST /trip/save`, it means the frontend did not navigate to the export URL — first confirm the frontend code has been updated and restarted.
 
-### `npm run dev` 提示找不到 `package.json`
+### `npm run dev` reports that `package.json` can't be found
 
-说明当前目录错了。前端命令必须在 `frontend/` 目录执行：
+This means you're in the wrong directory. Frontend commands must be run from the `frontend/` directory:
 
 ```bash
 cd ~/autodl-tmp/TripPlannerDemo/frontend
 ```
 
-不要在 `backend/` 目录运行 `npm run dev`。
+Do not run `npm run dev` from the `backend/` directory.
 
-## 7. 当前推荐验证顺序
+## 7. Recommended Verification Order
 
-1. 启动后端
-2. 启动前端
-3. 生成一条行程
-4. 查看地图点位
-5. 查看天气信息
-6. 保存行程
-7. 打开历史列表
-8. 智能调整某一天
-9. 导出 PDF
-10. 删除测试行程
+1. Start the backend
+2. Start the frontend
+3. Generate a trip
+4. Check the map locations
+5. Check the weather information
+6. Save the trip
+7. Open the history list
+8. Smart-adjust a specific day
+9. Export as PDF
+10. Delete the test trip

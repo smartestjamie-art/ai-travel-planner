@@ -15,7 +15,7 @@ from app.rag.vector_db import ingest_guide_chunks_to_chroma, load_guide_chunks
 
 def main() -> int:
     chunks = load_guide_chunks()
-    print("=== 准备写入 Chroma ===")
+    print("=== Preparing to write to Chroma ===")
     print(f"chunk_count: {len(chunks)}")
     print(f"embedding_model: {EMBEDDING_MODEL}")
     print(f"chroma_db_dir: {CHROMA_DB_DIR}")
@@ -24,7 +24,7 @@ def main() -> int:
 
     written_count = ingest_guide_chunks_to_chroma()
 
-    print("=== 写入完成 ===")
+    print("=== Write complete ===")
     print(f"written_count: {written_count}")
     return 0
 

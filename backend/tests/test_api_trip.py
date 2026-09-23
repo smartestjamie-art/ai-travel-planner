@@ -4,7 +4,7 @@ import sys
 from fastapi.testclient import TestClient
 
 
-# 允许测试文件直接导入 backend/app 下的模块。
+# Allow test files to directly import modules under backend/app.
 CURRENT_FILE = Path(__file__).resolve()
 BACKEND_DIR = CURRENT_FILE.parent.parent
 if str(BACKEND_DIR) not in sys.path:
@@ -18,28 +18,28 @@ client = TestClient(app)
 
 
 def build_generate_payload() -> dict:
-    """构造一个合法的生成行程请求体。"""
+    """Build a valid request body for generating a trip itinerary."""
     return {
-        "destination": "大理",
+        "destination": "Dali",
         "start_date": "2026-04-10",
         "end_date": "2026-04-12",
         "travelers": 2,
         "budget": 3200,
-        "preferences": ["自然风景", "拍照", "美食"],
-        "pace": "轻松",
-        "dietary_preferences": ["少辣"],
-        "hotel_level": "舒适型",
-        "special_notes": "不想太早起床，希望安排一个适合看日落的地点",
+        "preferences": ["natural scenery", "photography", "food"],
+        "pace": "relaxed",
+        "dietary_preferences": ["mild spice"],
+        "hotel_level": "comfortable",
+        "special_notes": "Don't want to wake up too early, and would like a spot suitable for watching the sunset",
     }
 
 
 def test_generate_trip_returns_itinerary_successfully() -> None:
-    """测试 POST /trip/generate 能返回结构化 itinerary。"""
+    """Test that POST /trip/generate returns a structured itinerary."""
     response = client.post("/trip/generate", json=build_generate_payload())
 
     assert response.status_code == 200
     data = response.json()
-    assert data["destination"] == "大理"
+    assert data["destination"] == "Dali"
     assert "trip_id" in data
     assert "summary" in data
     assert "days" in data
@@ -50,7 +50,7 @@ def test_generate_trip_returns_itinerary_successfully() -> None:
 
 
 def test_generate_trip_rejects_invalid_request() -> None:
-    """测试非法请求会被 FastAPI/Pydantic 拦下。"""
+    """Test that an invalid request is rejected by FastAPI/Pydantic."""
     payload = build_generate_payload()
     payload["travelers"] = 0
 
@@ -60,7 +60,7 @@ def test_generate_trip_rejects_invalid_request() -> None:
 
 
 def test_root_endpoint_returns_running_message() -> None:
-    """测试根路径 / 能返回服务启动提示。"""
+    """Test that the root path / returns the service startup message."""
     response = client.get("/")
 
     assert response.status_code == 200
@@ -68,7 +68,7 @@ def test_root_endpoint_returns_running_message() -> None:
 
 
 def test_health_endpoint_returns_ok_status() -> None:
-    """测试 /health 能返回健康检查结果。"""
+    """Test that /health returns the health check result."""
     response = client.get("/health")
 
     assert response.status_code == 200
@@ -76,7 +76,7 @@ def test_health_endpoint_returns_ok_status() -> None:
 
 
 def test_edit_trip_returns_updated_itinerary_successfully(monkeypatch) -> None:
-    """测试 POST /trip/edit 能返回已修改的 itinerary。"""
+    """Test that POST /trip/edit returns the updated itinerary."""
     monkeypatch.setattr(trip_service, "generate_day_edit_draft", lambda request, target_day: (None, {"prompt_tokens": 0, "completion_tokens": 0}))
 
     generated_response = client.post("/trip/generate", json=build_generate_payload())
@@ -85,9 +85,9 @@ def test_edit_trip_returns_updated_itinerary_successfully(monkeypatch) -> None:
     edit_payload = {
         "trip_id": generated_itinerary["trip_id"],
         "current_itinerary": generated_itinerary,
-        "user_instruction": "第二天改得更轻松一点",
+        "user_instruction": "Make day 2 more relaxed",
         "edit_scope": "day_2",
-        "preserve_constraints": ["保留预算结构"],
+        "preserve_constraints": ["keep the budget structure"],
     }
 
     response = client.post("/trip/edit", json=edit_payload)
@@ -95,16 +95,16 @@ def test_edit_trip_returns_updated_itinerary_successfully(monkeypatch) -> None:
     assert response.status_code == 200
     data = response.json()
     assert data["trip_id"] == generated_itinerary["trip_id"]
-    assert data["days"][1]["theme"].endswith("（已调整为更轻松）")
+    assert data["days"][1]["theme"].endswith("(adjusted to be more relaxed)")
 
 
 def test_edit_trip_rejects_invalid_request() -> None:
-    """测试非法编辑请求会被 FastAPI/Pydantic 拦下。"""
+    """Test that an invalid edit request is rejected by FastAPI/Pydantic."""
     response = client.post(
         "/trip/edit",
         json={
             "trip_id": "trip_demo",
-            "user_instruction": "第二天轻松一点",
+            "user_instruction": "Make day 2 more relaxed",
         },
     )
 
@@ -112,7 +112,7 @@ def test_edit_trip_rejects_invalid_request() -> None:
 
 
 def test_save_trip_returns_trip_id_successfully() -> None:
-    """测试 POST /trip/save 能返回保存成功结果。"""
+    """Test that POST /trip/save returns a successful save result."""
     generated_response = client.post("/trip/generate", json=build_generate_payload())
     generated_itinerary = generated_response.json()
 
@@ -132,7 +132,7 @@ def test_save_trip_returns_trip_id_successfully() -> None:
 
 
 def test_get_trip_detail_returns_saved_itinerary() -> None:
-    """测试 GET /trip/{trip_id} 能返回已保存的 itinerary。"""
+    """Test that GET /trip/{trip_id} returns the saved itinerary."""
     generated_response = client.post("/trip/generate", json=build_generate_payload())
     generated_itinerary = generated_response.json()
 
@@ -150,18 +150,18 @@ def test_get_trip_detail_returns_saved_itinerary() -> None:
     assert response.status_code == 200
     data = response.json()
     assert data["trip_id"] == generated_itinerary["trip_id"]
-    assert data["itinerary"]["destination"] == "大理"
+    assert data["itinerary"]["destination"] == "Dali"
 
 
 def test_get_trip_detail_returns_404_for_missing_trip() -> None:
-    """测试查询不存在的 trip_id 时会返回 404。"""
+    """Test that querying a nonexistent trip_id returns 404."""
     response = client.get("/trip/trip_not_exists")
 
     assert response.status_code == 404
 
 
 def test_list_trips_returns_saved_trip_summaries() -> None:
-    """测试 GET /trip 能返回已保存行程的摘要列表。"""
+    """Test that GET /trip returns a summary list of saved trips."""
     generated_response = client.post("/trip/generate", json=build_generate_payload())
     generated_itinerary = generated_response.json()
 
@@ -185,7 +185,7 @@ def test_list_trips_returns_saved_trip_summaries() -> None:
 
 
 def test_export_trip_markdown_returns_markdown_text() -> None:
-    """测试 GET /export/{trip_id}/markdown 可以导出 Markdown 文本。"""
+    """Test that GET /export/{trip_id}/markdown can export Markdown text."""
     generated_response = client.post("/trip/generate", json=build_generate_payload())
     generated_itinerary = generated_response.json()
 
@@ -207,7 +207,7 @@ def test_export_trip_markdown_returns_markdown_text() -> None:
 
 
 def test_export_trip_pdf_returns_pdf_bytes(monkeypatch) -> None:
-    """测试 GET /export/{trip_id}/pdf 可以导出 PDF。"""
+    """Test that GET /export/{trip_id}/pdf can export a PDF."""
     generated_response = client.post("/trip/generate", json=build_generate_payload())
     generated_itinerary = generated_response.json()
 
@@ -234,7 +234,7 @@ def test_export_trip_pdf_returns_pdf_bytes(monkeypatch) -> None:
 
 
 def test_generate_trip_response_includes_rag_context() -> None:
-    """测试生成接口返回结果里包含最小 RAG 痕迹。"""
+    """Test that the generate endpoint's response includes minimal RAG traces."""
     response = client.post("/trip/generate", json=build_generate_payload())
 
     assert response.status_code == 200
@@ -242,4 +242,4 @@ def test_generate_trip_response_includes_rag_context() -> None:
     joined_notes = "\n".join(data["source_notes"])
 
     assert len(data["source_notes"]) >= 2
-    assert "大理" in joined_notes
+    assert "Dali" in joined_notes

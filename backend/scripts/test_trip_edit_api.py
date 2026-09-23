@@ -14,35 +14,35 @@ if str(BACKEND_DIR) not in sys.path:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    """构造命令行参数解析器。"""
+    """Build the command-line argument parser."""
     parser = argparse.ArgumentParser(
-        description="读取 generated_trip.json，并调用真实 /trip/edit 接口。"
+        description="Read generated_trip.json and call the real /trip/edit endpoint."
     )
     parser.add_argument(
         "--base-url",
         default="http://127.0.0.1:8000",
-        help="FastAPI 服务地址",
+        help="FastAPI service address",
     )
     parser.add_argument(
         "--input-file",
         default="generated_trip.json",
-        help="先前通过 /trip/generate 保存的 itinerary 文件",
+        help="Itinerary file previously saved via /trip/generate",
     )
     parser.add_argument(
         "--instruction",
-        default="第二天改得更轻松一点，不要安排太满",
-        help="用户编辑指令",
+        default="Make day two more relaxed, don't pack the schedule too full",
+        help="User edit instruction",
     )
     parser.add_argument(
         "--edit-scope",
         default="day_2",
-        help="编辑范围，例如 day_2",
+        help="Edit scope, e.g. day_2",
     )
     return parser
 
 
 def load_generated_trip(input_file: str) -> dict:
-    """读取 generated_trip.json。"""
+    """Read generated_trip.json."""
     file_path = Path(input_file)
     with file_path.open("r", encoding="utf-8") as file:
         return json.load(file)
@@ -53,18 +53,18 @@ def build_edit_payload(
     instruction: str,
     edit_scope: str,
 ) -> dict:
-    """组装 /trip/edit 的请求体。"""
+    """Assemble the request body for /trip/edit."""
     return {
         "trip_id": itinerary["trip_id"],
         "current_itinerary": itinerary,
         "user_instruction": instruction,
         "edit_scope": edit_scope,
-        "preserve_constraints": ["保留预算结构"],
+        "preserve_constraints": ["Preserve the budget structure"],
     }
 
 
 def post_json(url: str, payload: dict) -> dict:
-    """发送 JSON POST 请求并返回 JSON 响应。"""
+    """Send a JSON POST request and return the JSON response."""
     body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
     req = request.Request(
         url=url,
@@ -78,14 +78,14 @@ def post_json(url: str, payload: dict) -> dict:
 
 
 def print_day_summary(title: str, itinerary: dict, day_index: int) -> None:
-    """打印某一天的简要信息。"""
+    """Print a brief summary of a given day."""
     print(title)
     matched_day = next(
         (day for day in itinerary.get("days", []) if day.get("day_index") == day_index),
         None,
     )
     if matched_day is None:
-        print(f"未找到 day_{day_index}")
+        print(f"day_{day_index} not found")
         print()
         return
 
@@ -109,19 +109,19 @@ def main() -> int:
         edit_scope=args.edit_scope,
     )
 
-    print("=== 编辑请求 ===")
+    print("=== Edit request ===")
     print(json.dumps(payload, ensure_ascii=False, indent=2))
     print()
 
     response = post_json(f"{args.base_url}/trip/edit", payload)
 
-    print("=== 编辑后的 Itinerary ===")
+    print("=== Itinerary after editing ===")
     print(json.dumps(response, ensure_ascii=False, indent=2))
     print()
 
     target_day = 2
-    print_day_summary("=== 编辑前 day_2 ===", original_itinerary, target_day)
-    print_day_summary("=== 编辑后 day_2 ===", response, target_day)
+    print_day_summary("=== day_2 before editing ===", original_itinerary, target_day)
+    print_day_summary("=== day_2 after editing ===", response, target_day)
 
     return 0
 

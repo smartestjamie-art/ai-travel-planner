@@ -19,18 +19,18 @@ logger = logging.getLogger(__name__)
 
 
 def _ensure_amap_api_key() -> None:
-    """确保当前环境已经配置高德地图 Key。"""
+    """Ensure that AMAP_API_KEY is configured in the current environment."""
     if not AMAP_API_KEY:
-        raise RuntimeError("当前环境未配置 AMAP_API_KEY，无法调用天气服务。")
+        raise RuntimeError("AMAP_API_KEY is not configured in the current environment; cannot call the weather service.")
 
 
 def _build_client() -> httpx.Client:
-    """创建访问高德天气 API 的客户端。"""
+    """Create a client for accessing the Amap weather API."""
     return httpx.Client(timeout=AMAP_TIMEOUT_SECONDS)
 
 
 def _request_amap_weather(path: str, params: dict[str, Any]) -> dict[str, Any]:
-    """调用高德天气接口并返回 JSON 结果。"""
+    """Call the Amap weather endpoint and return the JSON result."""
     _ensure_amap_api_key()
 
     request_params = {
@@ -44,21 +44,21 @@ def _request_amap_weather(path: str, params: dict[str, Any]) -> dict[str, Any]:
         payload = response.json()
 
     if payload.get("status") != "1":
-        info = payload.get("info", "未知错误")
-        raise RuntimeError(f"高德天气接口调用失败：{info}")
+        info = payload.get("info", "Unknown error")
+        raise RuntimeError(f"Amap weather API call failed: {info}")
 
     return payload
 
 
 def _normalize_cache_text(value: str | None) -> str:
-    """把缓存 key 里用到的文本做简单标准化。"""
+    """Apply simple normalization to text used in cache keys."""
     if value is None:
         return ""
     return value.strip().lower()
 
 
 def get_weather_forecast(city: str) -> dict[str, Any]:
-    """获取指定城市的未来天气预报。"""
+    """Get the upcoming weather forecast for the given city."""
     cache_key = f"weather:forecast:{_normalize_cache_text(city)}"
     cached_value = get_cached_json(cache_key)
     if cached_value is not None:
@@ -79,7 +79,7 @@ def get_weather_forecast(city: str) -> dict[str, Any]:
 
     forecasts = payload.get("forecasts", [])
     if not forecasts:
-        raise RuntimeError("未获取到天气预报结果。")
+        raise RuntimeError("No weather forecast results were returned.")
 
     first = forecasts[0]
     casts = first.get("casts", [])

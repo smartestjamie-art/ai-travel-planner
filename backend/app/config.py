@@ -10,7 +10,7 @@ BACKEND_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BACKEND_DIR / ".env")
 
 
-# 数据库配置
+# Database configuration
 DB_DIR = BACKEND_DIR / "db"
 DB_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -22,7 +22,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 
-# 大模型配置
+# LLM configuration
 LLM_PROVIDER = os.getenv("LLM_PROVIDER", "openai_compatible")
 LLM_API_KEY = os.getenv("LLM_API_KEY", "")
 LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4o-mini")
@@ -31,7 +31,7 @@ LLM_TIMEOUT_SECONDS = int(os.getenv("LLM_TIMEOUT_SECONDS", "60"))
 LLM_MAX_RETRIES = int(os.getenv("LLM_MAX_RETRIES", "1"))
 
 
-# RAG / 向量库配置
+# RAG / vector store configuration
 _chroma_db_dir_raw = Path(os.getenv("CHROMA_DB_DIR", "db/chroma_db"))
 CHROMA_DB_DIR = (
     _chroma_db_dir_raw
@@ -46,7 +46,7 @@ EMBEDDING_BATCH_SIZE = int(os.getenv("EMBEDDING_BATCH_SIZE", "10"))
 RERANK_MODEL = os.getenv("RERANK_MODEL", "qwen3-rerank")
 
 
-# Redis / 缓存配置
+# Redis / cache configuration
 REDIS_ENABLED = os.getenv("REDIS_ENABLED", "false").lower() == "true"
 REDIS_URL = os.getenv("REDIS_URL", "redis://127.0.0.1:6379/0")
 REDIS_KEY_PREFIX = os.getenv("REDIS_KEY_PREFIX", "trip_planner")
@@ -57,7 +57,7 @@ REDIS_RAG_TTL_SECONDS = int(os.getenv("REDIS_RAG_TTL_SECONDS", "21600"))
 REDIS_RERANK_TTL_SECONDS = int(os.getenv("REDIS_RERANK_TTL_SECONDS", "21600"))
 
 
-# 高德地图配置
+# Amap (Gaode Maps) configuration
 AMAP_API_KEY = os.getenv("AMAP_API_KEY", "")
 AMAP_BASE_URL = os.getenv("AMAP_BASE_URL", "https://restapi.amap.com/v3")
 AMAP_DEFAULT_CITY = os.getenv("AMAP_DEFAULT_CITY", "")

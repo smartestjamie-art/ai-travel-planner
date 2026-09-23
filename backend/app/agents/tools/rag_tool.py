@@ -13,8 +13,8 @@ from app.rag.retriever import retrieve_travel_guide
 logger = logging.getLogger(__name__)
 
 
-# rag_tool.py 自己不直接检索，
-# 它只负责把"旅行规划语义"转成"检索查询"。
+# rag_tool.py itself does not perform retrieval directly,
+# it is only responsible for turning "travel planning intent" into a "retrieval query".
 def _append_unique(parts: list[str], value: str) -> None:
     normalized = value.strip()
     if not normalized:
@@ -24,30 +24,30 @@ def _append_unique(parts: list[str], value: str) -> None:
 
 
 def _extract_note_keywords(special_notes: str | None, destination: str | None = None) -> list[str]:
-    """从用户备注里提炼更适合检索的关键词，而不是直接拼整句。"""
+    """Extract keywords better suited for retrieval from the user's notes, rather than concatenating the whole sentence directly."""
     if not special_notes:
         return []
 
     keywords: list[str] = []
     note = special_notes.strip()
 
-    # 格式：(触发词, 目的地过滤, 输出关键词)
-    # 目的地为 None 表示通用，不限目的地
+    # Format: (trigger words, destination filter, output keywords)
+    # Destination of None means generic, not limited to a specific destination
     rule_keywords = [
-        (("日落", "傍晚"), "大理", ["日落", "傍晚", "洱海", "双廊"]),
-        (("日出", "清晨"), "大理", ["日出", "才村", "龙龛"]),
-        (("拍照", "出片", "摄影"), None, ["拍照", "摄影", "出片"]),
-        (("美食", "小吃", "吃"), None, ["美食", "小吃"]),
-        (("轻松", "慢节奏", "休闲"), None, ["轻松", "慢节奏", "休闲"]),
-        (("不想太早起床", "睡到自然醒"), None, ["轻松", "慢节奏"]),
-        (("古镇",), "大理", ["古镇", "大理古城", "喜洲古镇"]),
-        (("古镇",), "西安", ["古镇", "回民街"]),
-        (("古镇",), "厦门", ["古镇", "鼓浪屿", "曾厝垵"]),
-        (("骑行",), "大理", ["骑行", "洱海生态廊道"]),
-        (("骑行",), "厦门", ["骑行", "环岛路"]),
-        (("熊猫", "大熊猫"), "成都", ["大熊猫", "熊猫"]),
-        (("潜水",), "三亚", ["潜水", "蜈支洲岛"]),
-        (("海鲜",), "三亚", ["海鲜", "第一市场"]),
+        (("sunset", "evening"), "Dali", ["sunset", "evening", "Erhai Lake", "Shuanglang"]),
+        (("sunrise", "early morning"), "Dali", ["sunrise", "Caicun", "Longkan"]),
+        (("photography", "photo-worthy", "photo shoot"), None, ["photography", "photo shoot", "photo-worthy"]),
+        (("food", "snacks", "eating"), None, ["food", "snacks"]),
+        (("relaxed", "slow-paced", "leisurely"), None, ["relaxed", "slow-paced", "leisurely"]),
+        (("don't want to get up too early", "sleep in"), None, ["relaxed", "slow-paced"]),
+        (("ancient town",), "Dali", ["ancient town", "Dali Old Town", "Xizhou Ancient Town"]),
+        (("ancient town",), "Xi'an", ["ancient town", "Muslim Quarter"]),
+        (("ancient town",), "Xiamen", ["ancient town", "Gulangyu", "Zengcuoan"]),
+        (("cycling",), "Dali", ["cycling", "Erhai Lake Eco-Corridor"]),
+        (("cycling",), "Xiamen", ["cycling", "Ring Island Road"]),
+        (("panda", "giant panda"), "Chengdu", ["giant panda", "panda"]),
+        (("diving",), "Sanya", ["diving", "Wuzhizhou Island"]),
+        (("seafood",), "Sanya", ["seafood", "First Market"]),
     ]
 
     for triggers, required_dest, values in rule_keywords:
@@ -61,7 +61,7 @@ def _extract_note_keywords(special_notes: str | None, destination: str | None = 
 
 
 def _build_chat_llm():
-    """创建 ChatOpenAI 实例，用于 Query Rewrite。"""
+    """Create a ChatOpenAI instance, used for query rewriting."""
     if not LLM_API_KEY:
         return None
     try:
@@ -79,7 +79,7 @@ def _build_chat_llm():
 
 
 def _extract_token_usage(response) -> dict[str, int]:
-    """从 LangChain AIMessage 中提取 token 使用量。"""
+    """Extract token usage from a LangChain AIMessage."""
     usage = {"prompt_tokens": 0, "completion_tokens": 0}
     metadata = getattr(response, "response_metadata", None) or {}
     token_usage = metadata.get("token_usage", {})
@@ -95,29 +95,29 @@ def llm_rewrite_query(
     pace: str | None = None,
     special_notes: str | None = None,
 ) -> tuple[str | None, dict[str, int]]:
-    """用 LLM 把用户旅行需求改写成适合向量检索的 query。返回 (query, token_usage)。"""
+    """Use an LLM to rewrite the user's travel requirements into a query suitable for vector retrieval. Returns (query, token_usage)."""
     empty_usage = {"prompt_tokens": 0, "completion_tokens": 0}
     llm = _build_chat_llm()
     if llm is None:
         return None, empty_usage
 
     system_prompt = (
-        "你是一个 RAG 检索 query 改写专家。"
-        "你的任务是把用户的旅行需求改写成适合向量检索的关键词组合。"
-        "输出要求："
-        "1. 只输出检索关键词，用空格分隔"
-        "2. 不要输出解释、标点或任何多余文字"
-        "3. 关键词要具体，优先包含景点名称、活动类型、场景特征"
-        "4. 包含目的地城市名"
+        "You are an expert at rewriting RAG retrieval queries. "
+        "Your task is to rewrite the user's travel requirements into a combination of keywords suitable for vector retrieval. "
+        "Output requirements: "
+        "1. Output only the retrieval keywords, separated by spaces "
+        "2. Do not output explanations, punctuation, or any extraneous text "
+        "3. Keywords should be specific, preferring attraction names, activity types, and scene characteristics "
+        "4. Include the destination city name"
     )
 
-    parts = [f"目的地：{destination}"]
+    parts = [f"Destination: {destination}"]
     if preferences:
-        parts.append(f"偏好：{'、'.join(preferences)}")
+        parts.append(f"Preferences: {', '.join(preferences)}")
     if pace:
-        parts.append(f"节奏：{pace}")
+        parts.append(f"Pace: {pace}")
     if special_notes:
-        parts.append(f"备注：{special_notes}")
+        parts.append(f"Notes: {special_notes}")
     human_prompt = "\n".join(parts)
 
     try:
@@ -148,7 +148,7 @@ def _rule_based_query(
     pace: str | None = None,
     special_notes: str | None = None,
 ) -> str:
-    """规则级 Query Rewrite，作为 LLM Rewrite 的 fallback。"""
+    """Rule-based query rewrite, used as a fallback for LLM rewriting."""
     parts: list[str] = [destination]
 
     if preferences:
@@ -161,7 +161,7 @@ def _rule_based_query(
     for keyword in _extract_note_keywords(special_notes, destination=destination):
         _append_unique(parts, keyword)
 
-    for stable_term in ["景点", "行程", "攻略", "推荐"]:
+    for stable_term in ["attractions", "itinerary", "travel guide", "recommendations"]:
         _append_unique(parts, stable_term)
 
     return " ".join(part for part in parts if part).strip()
@@ -173,7 +173,7 @@ def build_destination_query(
     pace: str | None = None,
     special_notes: str | None = None,
 ) -> tuple[str, dict[str, int]]:
-    """把目的地、偏好、节奏和备注改写成更贴近检索场景的 query。返回 (query, token_usage)。"""
+    """Rewrite the destination, preferences, pace, and notes into a query better suited for retrieval. Returns (query, token_usage)."""
     llm_query, token_usage = llm_rewrite_query(
         destination=destination,
         preferences=preferences,
@@ -198,7 +198,7 @@ def _build_destination_query(
     pace: str | None = None,
     special_notes: str | None = None,
 ) -> tuple[str, dict[str, int]]:
-    """兼容旧调用，内部转到公开的 query 构造函数。"""
+    """Kept for backward compatibility with old callers; internally delegates to the public query builder."""
     return build_destination_query(
         destination=destination,
         preferences=preferences,
@@ -214,7 +214,7 @@ def get_destination_guide_context(
     special_notes: str | None = None,
     top_k: int = 5,
 ) -> tuple[list[str], dict[str, int], dict[str, int], dict[str, int]]:
-    """根据目的地和偏好返回本地攻略片段。返回 (contexts, rewrite_usage, rerank_usage, embedding_usage)。"""
+    """Return local travel guide snippets based on the destination and preferences. Returns (contexts, rewrite_usage, rerank_usage, embedding_usage)."""
     query, rewrite_usage = build_destination_query(
         destination=destination,
         preferences=preferences,

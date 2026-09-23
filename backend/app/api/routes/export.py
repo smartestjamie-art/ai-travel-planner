@@ -11,7 +11,7 @@ router = APIRouter(prefix="/export", tags=["export"])
 
 
 def _build_inline_filename_header(filename: str) -> dict[str, str]:
-    """生成兼容中文文件名的响应头。"""
+    """Generate a response header that supports non-ASCII filenames."""
     return {
         "Content-Disposition": f"inline; filename*=UTF-8''{quote(filename)}",
     }
@@ -19,7 +19,7 @@ def _build_inline_filename_header(filename: str) -> dict[str, str]:
 
 @router.get("/{trip_id}/markdown", response_class=PlainTextResponse)
 def export_trip_markdown(trip_id: str) -> PlainTextResponse:
-    """把已保存 itinerary 导出为 Markdown 文本。"""
+    """Export a saved itinerary as Markdown text."""
     trip_detail = get_itinerary_by_trip_id(trip_id)
     if trip_detail is None:
         raise HTTPException(status_code=404, detail="Trip not found.")
@@ -34,7 +34,7 @@ def export_trip_markdown(trip_id: str) -> PlainTextResponse:
 
 @router.get("/{trip_id}/pdf", response_class=Response)
 def export_trip_pdf(trip_id: str) -> Response:
-    """把已保存 itinerary 导出为 PDF。"""
+    """Export a saved itinerary as a PDF."""
     trip_detail = get_itinerary_by_trip_id(trip_id)
     if trip_detail is None:
         raise HTTPException(status_code=404, detail="Trip not found.")

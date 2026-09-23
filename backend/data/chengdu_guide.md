@@ -1,67 +1,67 @@
-# 2026 成都深度游玩全攻略
+# 2026 Complete Chengdu Travel Guide
 
-## 1. 目的地简介
-成都是四川省省会，以"天府之国"闻名，是美食、大熊猫和慢生活的代名词。这里气候湿润，四季分明，春秋最佳。成都人爱喝茶、爱打麻将、爱吃火锅，整座城市弥漫着一种"巴适"的休闲氛围。适合美食爱好者、亲子家庭和喜欢慢节奏旅行的游客。
+## 1. Destination Overview
+Chengdu is the capital of Sichuan Province, famous as the "Land of Abundance" and synonymous with great food, giant pandas, and a slow-paced lifestyle. The climate is humid with distinct seasons, and spring and autumn are the best times to visit. Locals love drinking tea, playing mahjong, and eating hot pot, and the whole city carries a relaxed, easygoing (*basha*) vibe. It's ideal for food lovers, families, and travelers who enjoy a slower pace of travel.
 
-## 2. 核心景点推荐 (含门票与位置信息)
+## 2. Top Attractions (with Admission and Location Info)
 
-### 2.1 大熊猫繁育研究基地
-* **位置**：成都市成华区熊猫大道 1375 号
-* **门票**：55元/人
-* **游玩时长**：3-4小时
-* **简介**：全球最大的大熊猫人工繁育基地，可以近距离观看大熊猫吃竹子、爬树、打滚。建议早上入园，上午是熊猫最活跃的时段。春季可见新生熊猫幼崽。
+### 2.1 Chengdu Research Base of Giant Panda Breeding
+* **Location**: 1375 Panda Avenue, Chenghua District, Chengdu
+* **Admission**: 55 yuan/person
+* **Suggested Duration**: 3-4 hours
+* **Overview**: The world's largest giant panda breeding facility, where you can watch pandas up close as they eat bamboo, climb trees, and tumble around. Arrive in the morning, when the pandas are most active. Newborn panda cubs can sometimes be seen in spring.
 
-### 2.2 宽窄巷子
-* **位置**：成都市青羊区长顺街附近
-* **门票**：免费
-* **游玩时长**：2-3小时
-* **简介**：由宽巷子、窄巷子、井巷子平行排列组成，是成都遗留下来的较成规模的清朝古街道。集美食、茶馆、文创店于一体，适合傍晚散步和品尝小吃。
+### 2.2 Kuanzhai Alley (Wide and Narrow Alleys)
+* **Location**: Near Changshun Street, Qingyang District, Chengdu
+* **Admission**: Free
+* **Suggested Duration**: 2-3 hours
+* **Overview**: Made up of Wide Alley, Narrow Alley, and Well Alley running in parallel, this is one of the best-preserved clusters of Qing-dynasty streets left in Chengdu. It combines food, teahouses, and creative shops, and is great for an evening stroll and snacking.
 
-### 2.3 武侯祠
-* **位置**：成都市武侯区武侯祠大街 231 号
-* **门票**：50元/人
-* **游玩时长**：2-3小时
-* **简介**：中国唯一的君臣合祀祠庙，纪念诸葛亮与刘备。红墙竹影是经典拍照点，三国文化爱好者必去。旁边的锦里古街可以一并游览。
+### 2.3 Wuhou Shrine
+* **Location**: 231 Wuhou Shrine Street, Wuhou District, Chengdu
+* **Admission**: 50 yuan/person
+* **Suggested Duration**: 2-3 hours
+* **Overview**: China's only shrine honoring both a ruler and his minister together, dedicated to Zhuge Liang and Liu Bei. The red walls and bamboo shadows make for classic photos, and it's a must for fans of Three Kingdoms history. The adjacent Jinli Ancient Street is worth visiting at the same time.
 
-### 2.4 都江堰
-* **位置**：成都市都江堰市（距市区约 1 小时车程）
-* **门票**：80元/人
-* **游玩时长**：半天
-* **简介**：世界文化遗产，始建于秦代的大型水利工程，至今仍在使用。鱼嘴分水堤、飞沙堰、宝瓶口是三大核心看点。适合对历史和水利工程感兴趣的游客。
+### 2.4 Dujiangyan Irrigation System
+* **Location**: Dujiangyan City, Chengdu (about a 1-hour drive from downtown)
+* **Admission**: 80 yuan/person
+* **Suggested Duration**: Half a day
+* **Overview**: A UNESCO World Heritage Site and a massive water-control project first built in the Qin dynasty that is still in use today. The Fish Mouth Levee, Flying Sand Weir, and Bottle-Neck Channel are the three core highlights. Great for travelers interested in history and hydraulic engineering.
 
-### 2.5 青城山
-* **位置**：成都市都江堰市（与都江堰景区相邻）
-* **门票**：前山 80元/人，后山 20元/人
-* **游玩时长**：1天
-* **简介**：道教名山，素有"青城天下幽"之称。前山以道教文化为主，后山以自然风光为主。适合喜欢徒步和清静环境的游客。
+### 2.5 Mount Qingcheng
+* **Location**: Dujiangyan City, Chengdu (adjacent to the Dujiangyan scenic area)
+* **Admission**: Front mountain 80 yuan/person; back mountain 20 yuan/person
+* **Suggested Duration**: A full day
+* **Overview**: A famous Taoist mountain known as "the most secluded mountain under heaven." The front mountain focuses on Taoist culture, while the back mountain highlights natural scenery. Great for travelers who enjoy hiking and quiet surroundings.
 
-## 3. 特色餐饮与预算参考
+## 3. Local Food and Budget Guide
 
-* **火锅**：成都必吃，推荐小龙坎、蜀大侠等本地品牌，人均预算约 **100-150元**。
-* **串串香**：竹签穿的迷你火锅，按签计费，人均预算约 **60-80元**。
-* **担担面**：经典川味面食，麻辣鲜香，人均预算 **15-20元**。
-* **兔头**：成都特色小吃，五香或麻辣两种口味，人均预算 **15-25元/个**。
-* **甜水面**：甜辣口味的粗面条，人均预算 **10元**。
-* **蛋烘糕**：街头小吃，甜咸均可，人均预算 **5-8元**。
+* **Hot Pot**: A Chengdu essential — try local chains like Xiaolongkan or Shudaxia; budget roughly **100-150 yuan per person**.
+* **Chuan Chuan (Skewer Hot Pot)**: Mini hot pot on bamboo skewers, priced by the skewer; budget roughly **60-80 yuan per person**.
+* **Dan Dan Noodles**: A classic Sichuan noodle dish, spicy and fragrant; budget **15-20 yuan per person**.
+* **Rabbit Head**: A Chengdu specialty snack, available in five-spice or spicy flavors; budget **15-25 yuan each**.
+* **Sweet Water Noodles**: Thick noodles in a sweet-and-spicy sauce; budget **10 yuan per person**.
+* **Egg Pancakes (Danhonggao)**: A street snack available sweet or savory; budget **5-8 yuan per person**.
 
-## 4. 住宿区域建议
+## 4. Where to Stay
 
-* **春熙路/太古里**：市中心核心商圈，交通便利，购物餐饮丰富。酒店预算：**300-600元/晚**。
-* **宽窄巷子周边**：靠近景点，老成都氛围浓厚。酒店预算：**250-500元/晚**。
-* **锦里/武侯祠周边**：适合文化体验型游客。酒店预算：**200-400元/晚**。
-* **都江堰市区**：适合计划游都江堰和青城山的游客。酒店预算：**150-300元/晚**。
+* **Chunxi Road / Taikoo Li**: The core downtown shopping district, with convenient transport and abundant shopping and dining. Hotel budget: **300-600 yuan/night**.
+* **Around Kuanzhai Alley**: Close to the sights, with a strong old-Chengdu atmosphere. Hotel budget: **250-500 yuan/night**.
+* **Jinli / Wuhou Shrine Area**: Great for travelers focused on cultural experiences. Hotel budget: **200-400 yuan/night**.
+* **Dujiangyan City**: Ideal for travelers planning to visit Dujiangyan and Mount Qingcheng. Hotel budget: **150-300 yuan/night**.
 
-## 5. 经典三日行程参考 (Agent 提取样本)
+## 5. Sample Classic 3-Day Itinerary (Agent Extraction Sample)
 
-* **第一天：市区经典**
-  * 上午：前往【大熊猫繁育研究基地】，近距离观看大熊猫。
-  * 下午：游览【宽窄巷子】，品尝成都小吃，体验盖碗茶。
-  * 晚上：在春熙路/太古里逛街，吃火锅。
-* **第二天：文化深度**
-  * 上午：参观【武侯祠】，感受三国文化，逛锦里古街。
-  * 下午：去人民公园喝茶、看当地人打麻将，体验成都慢生活。
-  * 晚上：品尝串串香，逛九眼桥酒吧街。
-* **第三天：都江堰 + 青城山**
-  * 上午：前往【都江堰】，参观鱼嘴分水堤和宝瓶口。
-  * 下午：前往【青城山前山】，徒步感受道教文化与山林幽静。
-  * 晚上：返回市区，品尝担担面和兔头。
+* **Day 1: Downtown Classics**
+  * Morning: Visit the **Chengdu Research Base of Giant Panda Breeding** to see pandas up close.
+  * Afternoon: Explore **Kuanzhai Alley**, sample local snacks, and try a lidded-bowl tea.
+  * Evening: Shop around Chunxi Road/Taikoo Li and have hot pot for dinner.
+* **Day 2: A Deeper Dive into Culture**
+  * Morning: Visit **Wuhou Shrine** to soak up Three Kingdoms history, then stroll through Jinli Ancient Street.
+  * Afternoon: Head to People's Park for tea and to watch locals play mahjong — a true taste of Chengdu's slow life.
+  * Evening: Try chuan chuan and check out the bar street on Jiuyan Bridge.
+* **Day 3: Dujiangyan + Mount Qingcheng**
+  * Morning: Visit **Dujiangyan** and see the Fish Mouth Levee and the Bottle-Neck Channel.
+  * Afternoon: Head to the front mountain of **Mount Qingcheng** for a hike steeped in Taoist culture and forest tranquility.
+  * Evening: Return downtown and try dan dan noodles and rabbit head.

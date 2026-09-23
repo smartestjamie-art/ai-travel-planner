@@ -1,9 +1,10 @@
+import json
 from pathlib import Path
 import sys
 from types import ModuleType
 
 
-# 允许测试文件直接导入 backend/app 下的模块。
+# Allow test files to import modules under backend/app directly.
 CURRENT_FILE = Path(__file__).resolve()
 BACKEND_DIR = CURRENT_FILE.parent.parent
 if str(BACKEND_DIR) not in sys.path:
@@ -22,35 +23,35 @@ from app.models.schemas import (  # noqa: E402
 
 
 def build_trip_request() -> TripRequest:
-    """构造一个合法的 TripRequest，供 agent 测试复用。"""
+    """Build a valid TripRequest for reuse across agent tests."""
     return TripRequest(
-        destination="大理",
+        destination="Kyoto",
         start_date="2026-04-10",
         end_date="2026-04-12",
         travelers=2,
         budget=3200,
-        preferences=["自然风景", "拍照", "美食"],
-        pace="轻松",
-        dietary_preferences=["少辣"],
-        hotel_level="舒适型",
-        special_notes="不想太早起床，希望安排一个适合看日落的地点",
+        preferences=["nature scenery", "photography", "food"],
+        pace="relaxed",
+        dietary_preferences=["mild spice"],
+        hotel_level="comfort",
+        special_notes="Don't want to wake up too early; hoping for a spot good for sunset viewing",
     )
 
 
 def build_planner_draft(day_count: int) -> trip_planner_agent.PlannerDraft:
-    """构造一个假的 PlannerDraft，模拟 LLM 正常返回。"""
+    """Build a fake PlannerDraft simulating a normal LLM response."""
     return trip_planner_agent.PlannerDraft(
-        summary="这是一份适合轻松游玩的大理行程草稿。",
-        tips=["早晚温差较大，建议带薄外套。"],
+        summary="This is a draft itinerary for a relaxed Kyoto trip.",
+        tips=["Big day/night temperature swings, bring a light jacket."],
         days=[
             trip_planner_agent.PlannerDayDraft(
                 day_index=index + 1,
-                theme=f"第 {index + 1} 天主题",
-                spot_name=f"景点 {index + 1}",
-                spot_description=f"推荐景点 {index + 1} 的原因。",
-                meal_name=f"餐厅 {index + 1}",
-                meal_notes=f"餐饮说明 {index + 1}",
-                daily_note=f"当天备注 {index + 1}",
+                theme=f"Day {index + 1} theme",
+                spot_name=f"Spot {index + 1}",
+                spot_description=f"Reason to recommend spot {index + 1}.",
+                meal_name=f"Restaurant {index + 1}",
+                meal_notes=f"Meal notes {index + 1}",
+                daily_note=f"Notes for the day {index + 1}",
             )
             for index in range(day_count)
         ],
@@ -58,7 +59,7 @@ def build_planner_draft(day_count: int) -> trip_planner_agent.PlannerDraft:
 
 
 def install_fake_langchain_openai(monkeypatch, result: trip_planner_agent.PlannerDraft) -> tuple[type, type]:
-    """往 sys.modules 注入假的 langchain_openai 模块，并返回两个假类。"""
+    """Inject a fake langchain_openai module into sys.modules and return the two fake classes."""
 
     class FakeResponse:
         def __init__(self, content):
@@ -90,7 +91,7 @@ def install_fake_langchain_openai(monkeypatch, result: trip_planner_agent.Planne
 
 
 def test_collect_trip_context_calls_rag_tool_with_expected_arguments(monkeypatch) -> None:
-    """测试 collect_trip_context 会把参数正确传给 rag_tool。"""
+    """Test that collect_trip_context passes its arguments correctly to rag_tool."""
     captured = {}
 
     def fake_get_destination_guide_context(destination, preferences, pace, special_notes, top_k):
@@ -100,7 +101,7 @@ def test_collect_trip_context_calls_rag_tool_with_expected_arguments(monkeypatch
         captured["special_notes"] = special_notes
         captured["top_k"] = top_k
         return (
-            ["攻略片段 1", "攻略片段 2"],
+            ["Guide snippet 1", "Guide snippet 2"],
             {"prompt_tokens": 0, "completion_tokens": 0},
             {"prompt_tokens": 0, "completion_tokens": 0},
             {"prompt_tokens": 0, "completion_tokens": 0},
@@ -113,29 +114,29 @@ def test_collect_trip_context_calls_rag_tool_with_expected_arguments(monkeypatch
     )
 
     results, _, _, _ = trip_planner_agent.collect_trip_context(
-        "大理",
-        ["美食", "拍照"],
-        pace="轻松",
-        special_notes="想看日落，不想早起",
+        "Kyoto",
+        ["food", "photography"],
+        pace="relaxed",
+        special_notes="Want to see the sunset, don't want to wake up early",
     )
 
-    assert results == ["攻略片段 1", "攻略片段 2"]
+    assert results == ["Guide snippet 1", "Guide snippet 2"]
     assert captured == {
-        "destination": "大理",
-        "preferences": ["美食", "拍照"],
-        "pace": "轻松",
-        "special_notes": "想看日落，不想早起",
+        "destination": "Kyoto",
+        "preferences": ["food", "photography"],
+        "pace": "relaxed",
+        "special_notes": "Want to see the sunset, don't want to wake up early",
         "top_k": 5,
     }
 
 
 def test_generate_planner_draft_returns_none_when_api_key_is_missing(monkeypatch) -> None:
-    """测试没有配置 LLM_API_KEY 时会直接返回 None。"""
+    """Test that None is returned directly when LLM_API_KEY is not configured."""
     monkeypatch.setattr(trip_planner_agent, "LLM_API_KEY", "")
 
     result, usage = trip_planner_agent.generate_planner_draft(
         request=build_trip_request(),
-        rag_contexts=["大理古城适合慢游。"],
+        rag_contexts=["Kyoto's old town is great for a leisurely stroll."],
         day_count=3,
     )
 
@@ -144,7 +145,7 @@ def test_generate_planner_draft_returns_none_when_api_key_is_missing(monkeypatch
 
 
 def test_generate_planner_draft_returns_structured_result_with_mock_llm(monkeypatch) -> None:
-    """测试 agent 能调用结构化 LLM 并返回 PlannerDraft。"""
+    """Test that the agent can call the structured LLM and return a PlannerDraft."""
     monkeypatch.setattr(trip_planner_agent, "LLM_API_KEY", "test-key")
     monkeypatch.setattr(trip_planner_agent, "LLM_MODEL", "fake-model")
     monkeypatch.setattr(trip_planner_agent, "LLM_BASE_URL", "https://example.test")
@@ -156,7 +157,7 @@ def test_generate_planner_draft_returns_structured_result_with_mock_llm(monkeypa
 
     result, usage = trip_planner_agent.generate_planner_draft(
         request=build_trip_request(),
-        rag_contexts=["大理古城适合傍晚散步。", "洱海生态廊道适合骑行。"],
+        rag_contexts=["Kyoto's old town is great for an evening walk.", "The lakeside greenway is great for cycling."],
         day_count=3,
     )
 
@@ -174,7 +175,7 @@ def test_generate_planner_draft_returns_structured_result_with_mock_llm(monkeypa
 
 
 def test_generate_planner_draft_builds_prompt_with_request_and_rag_context(monkeypatch) -> None:
-    """测试 prompt 中包含用户请求信息和本地攻略上下文。"""
+    """Test that the prompt includes the user's request info and local guide context."""
     monkeypatch.setattr(trip_planner_agent, "LLM_API_KEY", "test-key")
     monkeypatch.setattr(trip_planner_agent, "LLM_MODEL", "fake-model")
     monkeypatch.setattr(trip_planner_agent, "LLM_BASE_URL", "")
@@ -186,24 +187,24 @@ def test_generate_planner_draft_builds_prompt_with_request_and_rag_context(monke
 
     trip_planner_agent.generate_planner_draft(
         request=build_trip_request(),
-        rag_contexts=["大理古城适合傍晚散步。", "洱海生态廊道适合骑行。"],
+        rag_contexts=["Kyoto's old town is great for an evening walk.", "The lakeside greenway is great for cycling."],
         day_count=3,
     )
 
     messages = FakeChatOpenAI.last_messages
     assert messages is not None
     assert messages[0][0] == "system"
-    assert "旅行规划助手" in messages[0][1]
+    assert "travel planning assistant" in messages[0][1]
     assert messages[1][0] == "human"
-    assert "目的地：大理" in messages[1][1]
-    assert "偏好：自然风景、拍照、美食" in messages[1][1]
-    assert "本地攻略上下文：" in messages[1][1]
-    assert "大理古城适合傍晚散步。" in messages[1][1]
-    assert "洱海生态廊道适合骑行。" in messages[1][1]
+    assert "Destination: Kyoto" in messages[1][1]
+    assert "Preferences: nature scenery, photography, food" in messages[1][1]
+    assert "Local guide context:" in messages[1][1]
+    assert "Kyoto's old town is great for an evening walk." in messages[1][1]
+    assert "The lakeside greenway is great for cycling." in messages[1][1]
 
 
 def test_generate_planner_draft_returns_none_when_day_count_mismatches(monkeypatch) -> None:
-    """测试当 LLM 返回的天数不符合预期时，会回退为 None。"""
+    """Test that the result falls back to None when the LLM returns an unexpected number of days."""
     monkeypatch.setattr(trip_planner_agent, "LLM_API_KEY", "test-key")
     monkeypatch.setattr(trip_planner_agent, "LLM_MODEL", "fake-model")
     monkeypatch.setattr(trip_planner_agent, "LLM_BASE_URL", "")
@@ -215,7 +216,7 @@ def test_generate_planner_draft_returns_none_when_day_count_mismatches(monkeypat
 
     result, usage = trip_planner_agent.generate_planner_draft(
         request=build_trip_request(),
-        rag_contexts=["大理古城适合傍晚散步。"],
+        rag_contexts=["Kyoto's old town is great for an evening walk."],
         day_count=3,
     )
 
@@ -223,7 +224,7 @@ def test_generate_planner_draft_returns_none_when_day_count_mismatches(monkeypat
 
 
 def test_generate_day_edit_draft_accepts_nested_day_shape(monkeypatch) -> None:
-    """测试单日编辑结果即使返回 DayPlan 风格结构，也能被兼容解析。"""
+    """Test that a single-day edit result is still parsed correctly even when it comes back in a DayPlan-style shape."""
 
     class FakeResponse:
         def __init__(self, content):
@@ -244,20 +245,20 @@ def test_generate_day_edit_draft_accepts_nested_day_shape(monkeypatch) -> None:
             return FakeResponse(
                 json.dumps(
                     {
-                        "theme": "更轻松的喜洲慢游",
+                        "theme": "A more relaxed slow-paced day in the old town",
                         "spots": [
                             {
-                                "name": "双廊古镇",
-                                "description": "更适合看海、发呆和看日落。",
+                                "name": "Lakeside old town",
+                                "description": "Better suited for watching the sea, relaxing, and catching the sunset.",
                             }
                         ],
                         "meals": [
                             {
-                                "name": "海景下午茶",
-                                "notes": "保留轻松节奏，少辣。",
+                                "name": "Seaview afternoon tea",
+                                "notes": "Keep the relaxed pace, mild spice.",
                             }
                         ],
-                        "notes": ["上午慢慢出发，下午去双廊看日落。"],
+                        "notes": ["Head out slowly in the morning, go to the lakeside for sunset in the afternoon."],
                     },
                     ensure_ascii=False,
                 )
@@ -277,32 +278,32 @@ def test_generate_day_edit_draft_accepts_nested_day_shape(monkeypatch) -> None:
     target_day = DayPlan(
         day_index=2,
         date="2026-04-11",
-        theme="原始主题",
+        theme="Original theme",
         spots=[
             SpotItem(
-                name="喜洲古镇",
+                name="Old town district",
                 start_time="10:00",
                 end_time="12:00",
-                description="原始景点说明",
+                description="Original spot description",
                 estimated_cost=50.0,
-                location="大理",
+                location="Kyoto",
             )
         ],
         meals=[
             MealItem(
-                name="喜洲粑粑",
-                meal_type="午餐",
+                name="Local specialty snack",
+                meal_type="lunch",
                 estimated_cost=30.0,
-                notes="原始餐饮说明",
+                notes="Original meal notes",
             )
         ],
-        notes=["原始备注"],
+        notes=["Original notes"],
     )
     request = TripEditRequest(
         trip_id="trip_demo",
         current_itinerary=Itinerary(
             trip_id="trip_demo",
-            destination="大理",
+            destination="Kyoto",
             summary=itinerary.summary,
             days=[],
             estimated_budget=1000,
@@ -317,19 +318,19 @@ def test_generate_day_edit_draft_accepts_nested_day_shape(monkeypatch) -> None:
             tips=[],
             source_notes=[],
         ),
-        user_instruction="第二天改得更轻松一点，不要安排太满",
+        user_instruction="Make day two more relaxed, don't pack the schedule too full",
         edit_scope="day_2",
-        preserve_constraints=["保留预算结构"],
+        preserve_constraints=["Preserve the budget structure"],
     )
 
     result, usage = trip_planner_agent.generate_day_edit_draft(request, target_day)
 
     assert result is not None
-    assert result.theme == "更轻松的喜洲慢游"
+    assert result.theme == "A more relaxed slow-paced day in the old town"
     assert usage["prompt_tokens"] == 80
     assert usage["completion_tokens"] == 30
-    assert result.spot_name == "双廊古镇"
-    assert result.spot_description == "更适合看海、发呆和看日落。"
-    assert result.meal_name == "海景下午茶"
-    assert result.meal_notes == "保留轻松节奏，少辣。"
-    assert result.daily_note == "上午慢慢出发，下午去双廊看日落。"
+    assert result.spot_name == "Lakeside old town"
+    assert result.spot_description == "Better suited for watching the sea, relaxing, and catching the sunset."
+    assert result.meal_name == "Seaview afternoon tea"
+    assert result.meal_notes == "Keep the relaxed pace, mild spice."
+    assert result.daily_note == "Head out slowly in the morning, go to the lakeside for sunset in the afternoon."

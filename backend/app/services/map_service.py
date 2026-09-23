@@ -20,18 +20,18 @@ logger = logging.getLogger(__name__)
 
 
 def _ensure_amap_api_key() -> None:
-    """确保当前环境已经配置高德地图 Key。"""
+    """Ensure the current environment has an AMap key configured."""
     if not AMAP_API_KEY:
-        raise RuntimeError("当前环境未配置 AMAP_API_KEY，无法调用高德地图服务。")
+        raise RuntimeError("AMAP_API_KEY is not configured in the current environment; cannot call the AMap service.")
 
 
 def _build_client() -> httpx.Client:
-    """创建访问高德 HTTP API 的客户端。"""
+    """Create an HTTP client for accessing the AMap API."""
     return httpx.Client(timeout=AMAP_TIMEOUT_SECONDS)
 
 
 def _request_amap(path: str, params: dict[str, Any]) -> dict[str, Any]:
-    """调用高德地图 API 并返回 JSON 结果。"""
+    """Call the AMap API and return the JSON result."""
     _ensure_amap_api_key()
 
     request_params = {
@@ -45,14 +45,14 @@ def _request_amap(path: str, params: dict[str, Any]) -> dict[str, Any]:
         payload = response.json()
 
     if payload.get("status") != "1":
-        info = payload.get("info", "未知错误")
-        raise RuntimeError(f"高德地图接口调用失败：{info}")
+        info = payload.get("info", "Unknown error")
+        raise RuntimeError(f"AMap API call failed: {info}")
 
     return payload
 
 
 def _parse_float(value: str | None) -> float | None:
-    """把字符串安全转换成浮点数。"""
+    """Safely convert a string to a float."""
     if value in (None, ""):
         return None
     try:
@@ -62,7 +62,7 @@ def _parse_float(value: str | None) -> float | None:
 
 
 def _split_location(location: str | None) -> tuple[float | None, float | None]:
-    """把高德返回的 '经度,纬度' 文本拆成两个浮点数。"""
+    """Split the 'longitude,latitude' text returned by AMap into two floats."""
     if not location or "," not in location:
         return None, None
 
@@ -71,14 +71,14 @@ def _split_location(location: str | None) -> tuple[float | None, float | None]:
 
 
 def _normalize_cache_text(value: str | None) -> str:
-    """把缓存 key 里用到的文本做简单标准化。"""
+    """Simple normalization for text used in cache keys."""
     if value is None:
         return ""
     return value.strip().lower()
 
 
 def geocode_address(address: str, city: str | None = None) -> dict[str, Any] | None:
-    """根据地址获取经纬度信息。"""
+    """Get latitude/longitude information from an address."""
     cache_key = (
         f"map:geocode:{_normalize_cache_text(address)}:{_normalize_cache_text(city or AMAP_DEFAULT_CITY)}"
     )
@@ -120,7 +120,7 @@ def search_places(
     city: str | None = None,
     page_size: int = 5,
 ) -> list[dict[str, Any]]:
-    """根据关键词搜索 POI。"""
+    """Search POIs by keyword."""
     cache_key = (
         f"map:place:{_normalize_cache_text(keyword)}:{_normalize_cache_text(city or AMAP_DEFAULT_CITY)}:{page_size}"
     )
@@ -171,7 +171,7 @@ def estimate_route(
     destination_longitude: float,
     destination_latitude: float,
 ) -> dict[str, Any] | None:
-    """估算两点之间的驾车距离和耗时。"""
+    """Estimate the driving distance and duration between two points."""
     cache_key = (
         "map:route:"
         f"{origin_longitude:.6f},{origin_latitude:.6f}:"
@@ -225,7 +225,7 @@ def estimate_route(
 
 
 def _pick_best_place(keyword: str, city: str | None = None) -> dict[str, Any] | None:
-    """优先从 POI 搜索里选取第一条结果。"""
+    """Prefer the first result from a POI search."""
     results = search_places(keyword=keyword, city=city, page_size=1)
     if not results:
         return None
@@ -233,7 +233,7 @@ def _pick_best_place(keyword: str, city: str | None = None) -> dict[str, Any] | 
 
 
 def _enrich_spot(spot: SpotItem, city: str | None = None) -> bool:
-    """补全单个景点的地址、经纬度和 POI 信息。"""
+    """Fill in a single spot's address, coordinates, and POI information."""
     place = _pick_best_place(spot.name, city=city)
     if place is None and spot.location:
         place = _pick_best_place(spot.location, city=city)
@@ -257,7 +257,7 @@ def _enrich_spot(spot: SpotItem, city: str | None = None) -> bool:
 
 
 def _enrich_hotel(hotel: HotelItem, city: str | None = None) -> bool:
-    """补全单个酒店的地址和经纬度。"""
+    """Fill in a single hotel's address and coordinates."""
     place = _pick_best_place(hotel.name, city=city)
     if place is None and hotel.location:
         place = _pick_best_place(hotel.location, city=city)
@@ -279,7 +279,7 @@ def _enrich_hotel(hotel: HotelItem, city: str | None = None) -> bool:
 
 
 def _geocode_place_text(place_text: str | None, city: str | None = None) -> dict[str, Any] | None:
-    """把文本地点尽量解析成带经纬度的结果。"""
+    """Try to resolve a text place name into a result with coordinates."""
     if not place_text:
         return None
 
@@ -302,7 +302,7 @@ def _geocode_place_text(place_text: str | None, city: str | None = None) -> dict
 
 
 def _enrich_transport(transport: TransportItem, city: str | None = None) -> bool:
-    """补全单段交通的距离和耗时信息。"""
+    """Fill in the distance and duration information for a single transport leg."""
     origin = _geocode_place_text(transport.from_place, city=city)
     destination = _geocode_place_text(transport.to_place, city=city)
     if not origin or not destination:
@@ -325,12 +325,12 @@ def _enrich_transport(transport: TransportItem, city: str | None = None) -> bool
     transport.distance_km = route.get("distance_km")
     transport.estimated_minutes = route.get("estimated_minutes")
     if route.get("estimated_minutes") is not None and not transport.duration:
-        transport.duration = f"{route['estimated_minutes']} 分钟"
+        transport.duration = f"{route['estimated_minutes']} minutes"
     return True
 
 
 def enrich_itinerary_with_map_data(itinerary: Itinerary, city: str | None = None) -> Itinerary:
-    """使用高德服务补全 itinerary 里的地图字段。"""
+    """Use the AMap service to fill in map-related fields on the itinerary."""
     enriched_count = 0
 
     for day in itinerary.days:
@@ -356,7 +356,7 @@ def enrich_itinerary_with_map_data(itinerary: Itinerary, city: str | None = None
                 continue
 
     if enriched_count > 0:
-        note = "已补充高德地图地址、坐标或路线估算信息。"
+        note = "Address, coordinate, or route estimate information was supplemented using AMap."
         if note not in itinerary.source_notes:
             itinerary.source_notes.append(note)
 

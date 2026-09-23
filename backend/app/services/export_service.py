@@ -12,22 +12,22 @@ TECHNICAL_EXPORT_KEYWORDS = (
     "RAG",
     "LangChain",
     "Chroma",
-    "演示",
-    "测试",
-    "规则",
-    "模型",
-    "源码",
+    "demo",
+    "test",
+    "rule",
+    "model",
+    "source code",
     "trip_service",
 )
 
 
 def _safe_text(value: object) -> str:
-    """转义 ReportLab Paragraph 里的特殊字符，避免内容被当成标签解析。"""
+    """Escape special characters for a ReportLab Paragraph so content isn't parsed as markup."""
     return escape(str(value or ""))
 
 
 def _clean_export_tips(tips: list[str]) -> list[str]:
-    """过滤导出文件里的内部实现说明。"""
+    """Filter out internal implementation notes from the exported file."""
     cleaned_tips: list[str] = []
     for tip in tips:
         normalized_tip = tip.strip()
@@ -41,7 +41,7 @@ def _clean_export_tips(tips: list[str]) -> list[str]:
 
 
 def _public_source_notes(source_notes: list[str]) -> list[str]:
-    """只保留用户可读的攻略来源，过滤后端实现说明。"""
+    """Keep only user-facing source notes, filtering out backend implementation details."""
     public_notes: list[str] = []
     for note in source_notes:
         normalized_note = note.strip()
@@ -49,39 +49,39 @@ def _public_source_notes(source_notes: list[str]) -> list[str]:
             continue
         if any(keyword in normalized_note for keyword in TECHNICAL_EXPORT_KEYWORDS):
             continue
-        if normalized_note.startswith("[来源:"):
+        if normalized_note.startswith("[Source:"):
             public_notes.append(normalized_note)
     return public_notes
 
 
 def _render_budget_lines(itinerary: Itinerary) -> list[str]:
-    """把预算拆分渲染成 Markdown 列表。"""
+    """Render the budget breakdown as a Markdown list."""
     budget = itinerary.budget_breakdown
     return [
-        f"- 交通：{budget.transport:.2f} 元",
-        f"- 住宿：{budget.hotel:.2f} 元",
-        f"- 餐饮：{budget.meals:.2f} 元",
-        f"- 门票：{budget.tickets:.2f} 元",
-        f"- 其他：{budget.other:.2f} 元",
-        f"- 总计：{budget.total:.2f} 元",
+        f"- Transport: {budget.transport:.2f} CNY",
+        f"- Hotel: {budget.hotel:.2f} CNY",
+        f"- Meals: {budget.meals:.2f} CNY",
+        f"- Tickets: {budget.tickets:.2f} CNY",
+        f"- Other: {budget.other:.2f} CNY",
+        f"- Total: {budget.total:.2f} CNY",
     ]
 
 
 def itinerary_to_markdown(trip_detail: TripDetailResponse) -> str:
-    """把完整 itinerary 渲染成便于分享的 Markdown 文本。"""
+    """Render the full itinerary as easy-to-share Markdown text."""
     itinerary = trip_detail.itinerary
 
     lines: list[str] = [
-        f"# {itinerary.destination} 行程单",
+        f"# {itinerary.destination} Itinerary",
         "",
-        f"- 行程 ID：{trip_detail.trip_id}",
-        f"- 目的地：{itinerary.destination}",
-        f"- 预计预算：{itinerary.estimated_budget:.2f} 元",
+        f"- Trip ID: {trip_detail.trip_id}",
+        f"- Destination: {itinerary.destination}",
+        f"- Estimated budget: {itinerary.estimated_budget:.2f} CNY",
         "",
-        "## 行程概述",
+        "## Overview",
         itinerary.summary,
         "",
-        "## 每日安排",
+        "## Daily Schedule",
     ]
 
     for day in itinerary.days:
@@ -89,52 +89,52 @@ def itinerary_to_markdown(trip_detail: TripDetailResponse) -> str:
             [
                 "",
                 f"### Day {day.day_index} {day.theme or ''}".rstrip(),
-                f"- 日期：{day.date.isoformat()}" if day.date else "- 日期：待定",
+                f"- Date: {day.date.isoformat()}" if day.date else "- Date: TBD",
             ]
         )
 
         for spot in day.spots:
             lines.extend(
                 [
-                    f"- 主要景点：{spot.name}",
-                    f"  - 时间：{spot.start_time or '待定'} - {spot.end_time or '待定'}",
-                    f"  - 说明：{spot.description or '无'}",
+                    f"- Main attraction: {spot.name}",
+                    f"  - Time: {spot.start_time or 'TBD'} - {spot.end_time or 'TBD'}",
+                    f"  - Notes: {spot.description or 'None'}",
                 ]
             )
 
         for meal in day.meals:
             lines.extend(
                 [
-                    f"- 餐饮建议：{meal.name}（{meal.meal_type}）",
-                    f"  - 说明：{meal.notes or '无'}",
+                    f"- Meal suggestion: {meal.name} ({meal.meal_type})",
+                    f"  - Notes: {meal.notes or 'None'}",
                 ]
             )
 
         if day.hotel is not None:
             lines.append(
-                f"- 住宿安排：{day.hotel.name}（{day.hotel.level or '未标注档次'}）"
+                f"- Accommodation: {day.hotel.name} ({day.hotel.level or 'Unrated'})"
             )
 
         for note in day.notes:
-            lines.append(f"- 备注：{note}")
+            lines.append(f"- Note: {note}")
 
-    lines.extend(["", "## 预算拆分", *_render_budget_lines(itinerary)])
+    lines.extend(["", "## Budget Breakdown", *_render_budget_lines(itinerary)])
 
     export_tips = _clean_export_tips(itinerary.tips)
     if export_tips:
-        lines.extend(["", "## 旅行提示"])
+        lines.extend(["", "## Travel Tips"])
         lines.extend(f"- {tip}" for tip in export_tips)
 
     public_notes = _public_source_notes(itinerary.source_notes)
     if public_notes:
-        lines.extend(["", "## 攻略参考"])
+        lines.extend(["", "## References"])
         lines.extend(f"- {note}" for note in public_notes)
 
     return "\n".join(lines).strip() + "\n"
 
 
 def _register_pdf_font() -> str:
-    """注册一套可用于中文 PDF 的字体。"""
+    """Register a font suitable for rendering CJK text in the PDF."""
     from reportlab.pdfbase import pdfmetrics
     from reportlab.pdfbase.cidfonts import UnicodeCIDFont
 
@@ -147,7 +147,7 @@ def _register_pdf_font() -> str:
 
 
 def _draw_pdf_footer(canvas, doc, trip_detail: TripDetailResponse, font_name: str) -> None:
-    """在每一页底部绘制页脚和页码。"""
+    """Draw the footer and page number at the bottom of every page."""
     from reportlab.lib import colors
     from reportlab.lib.units import mm
 
@@ -163,12 +163,12 @@ def _draw_pdf_footer(canvas, doc, trip_detail: TripDetailResponse, font_name: st
     canvas.setFont(font_name, 9)
     canvas.setFillColor(colors.HexColor("#52606d"))
     canvas.drawString(doc.leftMargin, footer_y, f"Trip Planner Demo | {trip_detail.trip_id}")
-    canvas.drawRightString(page_width - doc.rightMargin, footer_y, f"第 {canvas.getPageNumber()} 页")
+    canvas.drawRightString(page_width - doc.rightMargin, footer_y, f"Page {canvas.getPageNumber()}")
     canvas.restoreState()
 
 
 def _load_pdf_image(image_url: str, max_width: float, max_height: float):
-    """下载景点图片并转换成 ReportLab 可渲染对象，失败时返回 None。"""
+    """Download an attraction image and convert it into a ReportLab-renderable object, returning None on failure."""
     from reportlab.platypus import Image
 
     if not image_url:
@@ -193,7 +193,7 @@ def _load_pdf_image(image_url: str, max_width: float, max_height: float):
 
 
 def itinerary_to_pdf_bytes(trip_detail: TripDetailResponse) -> bytes:
-    """把完整 itinerary 渲染成排版更清晰的 PDF 二进制内容。"""
+    """Render the full itinerary as a cleanly formatted PDF binary."""
     try:
         from reportlab.lib import colors
         from reportlab.lib.pagesizes import A4
@@ -208,7 +208,7 @@ def itinerary_to_pdf_bytes(trip_detail: TripDetailResponse) -> bytes:
         )
     except ImportError as exc:
         raise RuntimeError(
-            "PDF 导出依赖 reportlab，请先安装：pip install reportlab"
+            "PDF export requires reportlab; please install it first: pip install reportlab"
         ) from exc
 
     font_name = _register_pdf_font()
@@ -287,20 +287,20 @@ def itinerary_to_pdf_bytes(trip_detail: TripDetailResponse) -> bytes:
     )
 
     story = [
-        Paragraph(f"{_safe_text(itinerary.destination)} 行程单", title_style),
+        Paragraph(f"{_safe_text(itinerary.destination)} Itinerary", title_style),
         Paragraph(
-            f"行程 ID：{_safe_text(trip_detail.trip_id)}<br/>"
-            f"目的地：{_safe_text(itinerary.destination)}<br/>"
-            f"预计预算：{itinerary.estimated_budget:.2f} 元",
+            f"Trip ID: {_safe_text(trip_detail.trip_id)}<br/>"
+            f"Destination: {_safe_text(itinerary.destination)}<br/>"
+            f"Estimated budget: {itinerary.estimated_budget:.2f} CNY",
             subtitle_style,
         ),
     ]
 
     meta_table = Table(
         [
-            ["行程天数", str(len(itinerary.days))],
-            ["创建时间", trip_detail.created_at.isoformat() if trip_detail.created_at else "未记录"],
-            ["更新时间", trip_detail.updated_at.isoformat() if trip_detail.updated_at else "未记录"],
+            ["Trip length", str(len(itinerary.days))],
+            ["Created at", trip_detail.created_at.isoformat() if trip_detail.created_at else "Not recorded"],
+            ["Updated at", trip_detail.updated_at.isoformat() if trip_detail.updated_at else "Not recorded"],
         ],
         colWidths=[28 * mm, 120 * mm],
     )
@@ -320,10 +320,10 @@ def itinerary_to_pdf_bytes(trip_detail: TripDetailResponse) -> bytes:
     )
     story.extend([meta_table, Spacer(1, 8)])
 
-    story.append(Paragraph("行程概述", section_style))
+    story.append(Paragraph("Overview", section_style))
     story.append(Paragraph(_safe_text(itinerary.summary), body_style))
 
-    story.append(Paragraph("每日安排", section_style))
+    story.append(Paragraph("Daily Schedule", section_style))
     for day in itinerary.days:
         title = f"Day {day.day_index}"
         if day.theme:
@@ -331,62 +331,62 @@ def itinerary_to_pdf_bytes(trip_detail: TripDetailResponse) -> bytes:
         story.append(Paragraph(title, day_style))
 
         if day.date:
-            story.append(Paragraph(f"日期：{day.date.isoformat()}", body_style))
+            story.append(Paragraph(f"Date: {day.date.isoformat()}", body_style))
 
         for spot in day.spots:
-            story.append(Paragraph(f"主要景点：{_safe_text(spot.name)}", body_style))
+            story.append(Paragraph(f"Main attraction: {_safe_text(spot.name)}", body_style))
             image_url = getattr(spot, "image_url", None)
             spot_image = _load_pdf_image(image_url or "", max_width=72 * mm, max_height=42 * mm)
             if spot_image is not None:
                 story.extend([spot_image, Spacer(1, 4)])
             story.append(
                 Paragraph(
-                    f"时间：{_safe_text(spot.start_time or '待定')} - {_safe_text(spot.end_time or '待定')}",
+                    f"Time: {_safe_text(spot.start_time or 'TBD')} - {_safe_text(spot.end_time or 'TBD')}",
                     note_style,
                 )
             )
             if spot.address or spot.location:
                 story.append(
                     Paragraph(
-                        f"地址：{_safe_text(spot.address or spot.location)}",
+                        f"Address: {_safe_text(spot.address or spot.location)}",
                         note_style,
                     )
                 )
-            story.append(Paragraph(f"说明：{_safe_text(spot.description or '无')}", note_style))
+            story.append(Paragraph(f"Notes: {_safe_text(spot.description or 'None')}", note_style))
 
         for meal in day.meals:
             story.append(
                 Paragraph(
-                    f"餐饮建议：{_safe_text(meal.name)}（{_safe_text(meal.meal_type)}）",
+                    f"Meal suggestion: {_safe_text(meal.name)} ({_safe_text(meal.meal_type)})",
                     body_style,
                 )
             )
-            story.append(Paragraph(f"说明：{_safe_text(meal.notes or '无')}", note_style))
+            story.append(Paragraph(f"Notes: {_safe_text(meal.notes or 'None')}", note_style))
 
         if day.hotel is not None:
             story.append(
                 Paragraph(
-                    f"住宿安排：{_safe_text(day.hotel.name)}（{_safe_text(day.hotel.level or '未标注档次')}）",
+                    f"Accommodation: {_safe_text(day.hotel.name)} ({_safe_text(day.hotel.level or 'Unrated')})",
                     body_style,
                 )
             )
 
         for note in day.notes:
-            story.append(Paragraph(f"备注：{_safe_text(note)}", note_style))
+            story.append(Paragraph(f"Note: {_safe_text(note)}", note_style))
 
         story.append(Spacer(1, 4))
 
-    story.append(Paragraph("预算拆分", section_style))
+    story.append(Paragraph("Budget Breakdown", section_style))
     budget = itinerary.budget_breakdown
     budget_table = Table(
         [
-            ["项目", "金额（元）"],
-            ["交通", f"{budget.transport:.2f}"],
-            ["住宿", f"{budget.hotel:.2f}"],
-            ["餐饮", f"{budget.meals:.2f}"],
-            ["门票", f"{budget.tickets:.2f}"],
-            ["其他", f"{budget.other:.2f}"],
-            ["总计", f"{budget.total:.2f}"],
+            ["Item", "Amount (CNY)"],
+            ["Transport", f"{budget.transport:.2f}"],
+            ["Hotel", f"{budget.hotel:.2f}"],
+            ["Meals", f"{budget.meals:.2f}"],
+            ["Tickets", f"{budget.tickets:.2f}"],
+            ["Other", f"{budget.other:.2f}"],
+            ["Total", f"{budget.total:.2f}"],
         ],
         colWidths=[48 * mm, 48 * mm],
     )
@@ -410,13 +410,13 @@ def itinerary_to_pdf_bytes(trip_detail: TripDetailResponse) -> bytes:
 
     export_tips = _clean_export_tips(itinerary.tips)
     if export_tips:
-        story.append(Paragraph("旅行提示", section_style))
+        story.append(Paragraph("Travel Tips", section_style))
         for tip in export_tips:
             story.append(Paragraph(f"- {_safe_text(tip)}", body_style))
 
     public_notes = _public_source_notes(itinerary.source_notes)
     if public_notes:
-        story.append(Paragraph("攻略参考", section_style))
+        story.append(Paragraph("References", section_style))
         for note in public_notes:
             story.append(Paragraph(f"- {_safe_text(note)}", body_style))
 

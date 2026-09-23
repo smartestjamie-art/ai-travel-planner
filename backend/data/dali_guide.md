@@ -1,57 +1,57 @@
-# 2026 大理深度游玩全攻略
+# 2026 Complete Dali Travel Guide
 
-## 1. 目的地简介
-大理白族自治州位于云南省中部偏西，以“风花雪月”（下关风、上关花、苍山雪、洱海月）闻名。这里气候温和，四季如春，非常适合慢节奏的休闲度假与深度体验。
+## 1. Destination Overview
+The Dali Bai Autonomous Prefecture sits in west-central Yunnan Province, famous for its "wind, flowers, snow, and moon" — the wind of Xiaguan, the flowers of Shangguan, the snow on Cangshan Mountain, and the moon over Erhai Lake. The climate is mild with spring-like weather year-round, making it perfect for a relaxed, slow-paced getaway and in-depth exploration.
 
-## 2. 核心景点推荐 (含门票与位置信息)
+## 2. Top Attractions (with Admission and Location Info)
 
-### 2.1 大理古城
-* **位置**：大理市大理古城
-* **门票**：免费
-* **游玩时长**：3-4小时
-* **简介**：大理的文化中心，拥有洋人街、人民路等繁华街道。适合傍晚漫步，体验白族风情和各种独立小店。
+### 2.1 Dali Old Town
+* **Location**: Dali Old Town, Dali City
+* **Admission**: Free
+* **Suggested Duration**: 3-4 hours
+* **Overview**: The cultural heart of Dali, home to lively streets like Foreigner Street and People's Road. Great for an evening stroll to soak up Bai ethnic culture and browse the many independent shops.
 
-### 2.2 崇圣寺三塔
-* **位置**：大理古城北郊 1.5 公里处
-* **门票**：75元/人
-* **游玩时长**：2-3小时
-* **简介**：大理唯一的 5A 级景区，历史悠久，背靠苍山，面朝洱海，是摄影爱好者必打卡之地。
+### 2.2 Three Pagodas of Chongsheng Temple
+* **Location**: 1.5 km north of Dali Old Town
+* **Admission**: 75 yuan/person
+* **Suggested Duration**: 2-3 hours
+* **Overview**: Dali's only 5A-rated scenic area, with a long history, backed by Cangshan Mountain and facing Erhai Lake — a must-visit spot for photography enthusiasts.
 
-### 2.3 喜洲古镇
-* **位置**：大理市北部，洱海西岸
-* **门票**：免费
-* **游玩时长**：半天
-* **简介**：保留了大量保存完好的白族民居建筑群。春季有大片的油菜花田，秋季有稻田，非常出片。必体验项目：周城扎染。
+### 2.3 Xizhou Ancient Town
+* **Location**: Northern Dali City, on the western shore of Erhai Lake
+* **Admission**: Free
+* **Suggested Duration**: Half a day
+* **Overview**: Home to a large, well-preserved cluster of traditional Bai residential architecture. Rapeseed flower fields bloom in spring and rice paddies fill out in autumn, both making for stunning photos. A must-try experience: tie-dyeing in nearby Zhoucheng.
 
-### 2.4 洱海生态廊道 (骑行)
-* **位置**：环洱海沿线 (推荐才村至磻溪村段)
-* **门票**：免费 (自行车租赁约 30元/天)
-* **游玩时长**：半天
-* **简介**：近距离感受洱海风光的最佳方式，全程机动车禁行，非常安全，沿途有许多网红S湾。
+### 2.4 Erhai Lake Eco-Corridor (Cycling)
+* **Location**: Along the shore of Erhai Lake (the stretch from Caicun to Panxi Village is recommended)
+* **Admission**: Free (bike rental about 30 yuan/day)
+* **Suggested Duration**: Half a day
+* **Overview**: The best way to experience Erhai Lake up close — the entire route is closed to motor vehicles, making it very safe, with plenty of popular "S-curve" photo spots along the way.
 
-## 3. 特色餐饮与预算参考
+## 3. Local Food and Budget Guide
 
-* **野生菌火锅**：云南必吃美食，推荐在大理古城内享用，人均预算约 **120元**。
-* **喜洲粑粑**：喜洲古镇特色小吃，分为甜咸两味，人均预算 **10元**。
-* **白族土八碗**：传统白族宴席，适合家庭或团队聚餐，人均预算约 **80元**。
-* **凉鸡米线**：夏日解暑佳品，酸辣开胃，人均预算 **15元**。
+* **Wild Mushroom Hot Pot**: A Yunnan essential — best enjoyed within Dali Old Town; budget roughly **120 yuan per person**.
+* **Xizhou Baba**: A Xizhou specialty flatbread snack, available sweet or savory; budget **10 yuan per person**.
+* **Bai Ethnic Eight-Bowl Feast**: A traditional Bai banquet great for families or group dining; budget roughly **80 yuan per person**.
+* **Cold Chicken Rice Noodles**: A refreshing summer dish, sour, spicy, and appetizing; budget **15 yuan per person**.
 
-## 4. 住宿区域建议
+## 4. Where to Stay
 
-* **大理古城及周边**：交通便利，餐饮选择多，性价比高。酒店/客栈预算：**200-400元/晚**。
-* **双廊古镇**：位于洱海东岸，以绝美海景房著称，适合情侣度假。酒店/客栈预算：**600-1500元/晚**。
-* **才村/龙龛码头**：安静舒适，看日出的绝佳地点。酒店/客栈预算：**300-600元/晚**。
+* **Dali Old Town and Surroundings**: Convenient transport, plenty of dining choices, and great value. Hotel/guesthouse budget: **200-400 yuan/night**.
+* **Shuanglang Old Town**: On the eastern shore of Erhai Lake, famous for stunning lakeview rooms — ideal for couples on holiday. Hotel/guesthouse budget: **600-1,500 yuan/night**.
+* **Caicun / Longkan Pier**: Quiet and comfortable, and a fantastic spot to watch the sunrise. Hotel/guesthouse budget: **300-600 yuan/night**.
 
-## 5. 经典三日行程参考 (Agent 提取样本)
+## 5. Sample Classic 3-Day Itinerary (Agent Extraction Sample)
 
-* **第一天：初识大理**
-  * 上午：抵达大理，入住大理古城周边客栈。
-  * 下午：游览【大理古城】，逛人民路，打卡五华楼。
-  * 晚上：品尝野生菌火锅。
-* **第二天：白族文化与田园风光**
-  * 上午：前往【喜洲古镇】，参观白族民居，品尝喜洲粑粑。
-  * 下午：前往周城体验非遗【白族扎染】，随后在洱海生态廊道骑行。
-  * 晚上：返回古城，体验特色小酒馆。
-* **第三天：山水经典**
-  * 上午：参观【崇圣寺三塔】，感受皇家寺院的雄伟。
-  * 下午：前往双廊古镇散步，享受海景下午茶，随后根据时间返程。
+* **Day 1: First Taste of Dali**
+  * Morning: Arrive in Dali and check into a guesthouse near the Old Town.
+  * Afternoon: Explore **Dali Old Town**, stroll along People's Road, and visit Wuhua Tower.
+  * Evening: Enjoy a wild mushroom hot pot.
+* **Day 2: Bai Culture and Pastoral Scenery**
+  * Morning: Head to **Xizhou Ancient Town** to see the Bai residential architecture and try Xizhou baba.
+  * Afternoon: Visit Zhoucheng to experience the intangible-heritage craft of **Bai tie-dyeing**, then cycle along the Erhai Lake eco-corridor.
+  * Evening: Return to the Old Town and check out a cozy local bar.
+* **Day 3: Mountains and Water, the Classics**
+  * Morning: Visit the **Three Pagodas of Chongsheng Temple** to take in the grandeur of this former royal temple.
+  * Afternoon: Stroll through Shuanglang Old Town and enjoy a lakeview afternoon tea before heading back, depending on your schedule.

@@ -1,19 +1,19 @@
-# 展示图目录
+# Showcase Screenshots Directory
 
-这个目录用于存放 GitHub README 展示用的项目截图。
+This directory holds project screenshots used in the GitHub README.
 
-推荐命名方式：
+Recommended naming convention:
 
-- `home.png`：规划页
-- `result-overview.png`：结果页总览
-- `result-map.png`：地图与天气模块
-- `history.png`：历史列表页
-- `pdf-export.png`：PDF 导出效果
+- `home.png`: Planning page
+- `result-overview.png`: Results page overview
+- `result-map.png`: Map and weather module
+- `history.png`: History list page
+- `pdf-export.png`: PDF export result
 
-如果后面要在根目录 `README.md` 中展示图片，建议统一从这个目录读取，例如：
+If you plan to display images in the root `README.md` later, it's recommended to read them consistently from this directory, for example:
 
 ```md
-![规划页效果](./assets/showcase/home.png)
+![Planning page](./assets/showcase/home.png)
 ```
 
-当前这个目录会随项目一起上传到 GitHub，不会被 `.gitignore` 忽略。
+This directory is uploaded to GitHub along with the rest of the project and is not ignored by `.gitignore`.

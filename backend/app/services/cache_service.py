@@ -13,7 +13,7 @@ from app.config import (
 
 try:
     import redis
-except ImportError:  # pragma: no cover - 依赖未安装时优雅降级
+except ImportError:  # pragma: no cover - graceful degradation when the dependency is not installed
     redis = None
 
 
@@ -23,12 +23,12 @@ _redis_unavailable_logged = False
 
 
 def _build_key(key: str) -> str:
-    """为缓存 key 添加统一前缀，避免不同项目之间冲突。"""
+    """Add a consistent prefix to the cache key to avoid collisions between different projects."""
     return f"{REDIS_KEY_PREFIX}:{key}"
 
 
 def _get_redis_client():
-    """懒加载 Redis 客户端；不可用时返回 None。"""
+    """Lazily load the Redis client; return None if unavailable."""
     global _redis_client
     global _redis_unavailable_logged
 
@@ -36,7 +36,7 @@ def _get_redis_client():
         return None
     if redis is None:
         if not _redis_unavailable_logged:
-            logger.warning("Redis 已启用，但当前环境未安装 redis 依赖，缓存功能将被跳过。")
+            logger.warning("Redis is enabled, but the redis dependency is not installed in this environment; caching will be skipped.")
             _redis_unavailable_logged = True
         return None
     if _redis_client is not None:
@@ -47,15 +47,15 @@ def _get_redis_client():
         client.ping()
         _redis_client = client
         return _redis_client
-    except Exception as exc:  # pragma: no cover - 连接问题时优雅降级
+    except Exception as exc:  # pragma: no cover - graceful degradation on connection issues
         if not _redis_unavailable_logged:
-            logger.warning("Redis 连接失败，缓存功能将被跳过：%s", exc)
+            logger.warning("Failed to connect to Redis; caching will be skipped: %s", exc)
             _redis_unavailable_logged = True
         return None
 
 
 def get_cached_json(key: str) -> Any | None:
-    """读取 JSON 缓存；命中失败或 Redis 不可用时返回 None。"""
+    """Read a JSON cache entry; return None on a cache miss or when Redis is unavailable."""
     client = _get_redis_client()
     if client is None:
         return None
@@ -65,8 +65,8 @@ def get_cached_json(key: str) -> Any | None:
         if raw_value is None:
             return None
         return json.loads(raw_value)
-    except Exception as exc:  # pragma: no cover - 缓存失败不影响主流程
-        logger.debug("读取 Redis 缓存失败：%s", exc)
+    except Exception as exc:  # pragma: no cover - cache failures should not affect the main flow
+        logger.debug("Failed to read Redis cache: %s", exc)
         return None
 
 
@@ -75,7 +75,7 @@ def set_cached_json(
     value: Any,
     expire_seconds: int | None = None,
 ) -> None:
-    """写入 JSON 缓存；Redis 不可用时直接跳过。"""
+    """Write a JSON cache entry; skip directly if Redis is unavailable."""
     client = _get_redis_client()
     if client is None:
         return
@@ -83,6 +83,5 @@ def set_cached_json(
     ttl = expire_seconds or REDIS_DEFAULT_TTL_SECONDS
     try:
         client.set(_build_key(key), json.dumps(value, ensure_ascii=False), ex=ttl)
-    except Exception as exc:  # pragma: no cover - 缓存失败不影响主流程
-        logger.debug("写入 Redis 缓存失败：%s", exc)
-
+    except Exception as exc:  # pragma: no cover - cache failures should not affect the main flow
+        logger.debug("Failed to write Redis cache: %s", exc)

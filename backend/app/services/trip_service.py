@@ -28,17 +28,17 @@ TECHNICAL_TIP_KEYWORDS = (
     "RAG",
     "LangChain",
     "Chroma",
-    "演示",
-    "测试",
-    "规则",
-    "模型",
-    "源码",
+    "demo",
+    "test",
+    "rule",
+    "model",
+    "source code",
     "trip_service",
 )
 
 
 def _clean_user_tips(tips: list[str], destination: str | None = None) -> list[str]:
-    """过滤内部实现说明，只保留用户真正能用到的旅行建议。"""
+    """Filter out internal implementation notes, keeping only tips the user can actually act on."""
     cleaned_tips: list[str] = []
     for tip in tips:
         normalized_tip = tip.strip()
@@ -52,41 +52,41 @@ def _clean_user_tips(tips: list[str], destination: str | None = None) -> list[st
     if cleaned_tips:
         return cleaned_tips
 
-    place_text = destination or "目的地"
+    place_text = destination or "your destination"
     return [
-        f"建议根据{place_text}当天实时天气准备雨具或薄外套，早晚和临水区域体感可能偏凉。",
-        "古镇、生态廊道和石板路更适合慢慢走，鞋子尽量选择舒适防滑的款式。",
-        "热门景点建议错峰出发，给拍照、用餐和交通预留更从容的缓冲时间。",
+        f"Check the day-of forecast for {place_text} and pack rain gear or a light jacket — mornings, evenings, and waterfront areas can feel cooler than expected.",
+        "Old towns, eco-corridors, and cobblestone streets are best explored at a slow pace — wear comfortable, non-slip shoes.",
+        "Head to popular attractions outside peak hours, and leave a comfortable buffer for photos, meals, and transport.",
     ]
 
 
 def _build_demo_spot_names(destination: str, rag_contexts: list[str], day_count: int) -> list[str]:
-    """从攻略片段里挑出更像样的演示景点名称。"""
+    """Pick more realistic-sounding demo attraction names from the retrieved guide passages."""
     candidate_names: list[str] = []
     joined_context = "\n".join(rag_contexts)
 
-    if "大理古城" in joined_context:
-        candidate_names.append("大理古城")
-    if "喜洲古镇" in joined_context:
-        candidate_names.append("喜洲古镇")
-    if "崇圣寺三塔" in joined_context:
-        candidate_names.append("崇圣寺三塔")
-    if "洱海生态廊道" in joined_context:
-        candidate_names.append("洱海生态廊道")
+    if "Dali Old Town" in joined_context:
+        candidate_names.append("Dali Old Town")
+    if "Xizhou Ancient Town" in joined_context:
+        candidate_names.append("Xizhou Ancient Town")
+    if "Three Pagodas of Chongsheng Temple" in joined_context:
+        candidate_names.append("Three Pagodas of Chongsheng Temple")
+    if "Erhai Lake Eco-Corridor" in joined_context:
+        candidate_names.append("Erhai Lake Eco-Corridor")
 
     while len(candidate_names) < day_count:
-        candidate_names.append(f"{destination} 推荐景点 {len(candidate_names) + 1}")
+        candidate_names.append(f"{destination} recommended spot {len(candidate_names) + 1}")
 
     return candidate_names[:day_count]
 
 
 def _stable_bucket(text: str, modulo: int) -> int:
-    """基于文本生成一个稳定桶值，用来做确定性的价格浮动。"""
+    """Derive a stable bucket value from text, used for deterministic price variation."""
     return sum(ord(char) for char in text) % modulo if modulo > 0 else 0
 
 
 def _prorate_amounts(total: float, weights: list[float]) -> list[float]:
-    """按权重拆分金额，同时保证拆分后的总和与原总额一致。"""
+    """Split an amount by weights while keeping the split total equal to the original amount."""
     if not weights:
         return []
 
@@ -109,21 +109,21 @@ def _prorate_amounts(total: float, weights: list[float]) -> list[float]:
 
 
 def _estimate_ticket_cost(spot_name: str, description: str | None = None) -> float:
-    """根据景点关键词估算门票，更接近真实行程而不是固定数值。"""
-    text = f"{spot_name} {description or ''}"
+    """Estimate admission cost from attraction keywords, closer to a real itinerary than a fixed number."""
+    text = f"{spot_name} {description or ''}".lower()
     bucket = _stable_bucket(text, 4)
 
-    if any(keyword in text for keyword in ("古城", "古镇", "公园", "廊道", "村", "湿地", "街区")):
+    if any(keyword in text for keyword in ("old town", "ancient town", "park", "corridor", "village", "wetland", "district")):
         return [0.0, 20.0, 30.0, 40.0][bucket]
-    if any(keyword in text for keyword in ("寺", "三塔", "博物馆", "遗址", "山庄")):
+    if any(keyword in text for keyword in ("temple", "pagoda", "museum", "ruins", "resort")):
         return round(60.0 + (bucket * 18.0), 2)
-    if any(keyword in text for keyword in ("索道", "缆车", "游船", "演出", "雪山")):
+    if any(keyword in text for keyword in ("cable car", "ropeway", "cruise", "show", "snow mountain")):
         return round(120.0 + (bucket * 28.0), 2)
     return round(35.0 + (bucket * 12.0), 2)
 
 
 def _build_hotel_weights(day_count: int, start_date: DateType) -> list[float]:
-    """让住宿费用按周末、尾日等因素轻微浮动。"""
+    """Nudge nightly hotel cost up slightly for weekends and the last night of the trip."""
     weights: list[float] = []
     for index in range(day_count):
         current_date = start_date + timedelta(days=index)
@@ -139,8 +139,8 @@ def _build_hotel_weights(day_count: int, start_date: DateType) -> list[float]:
 
 
 def _build_meal_weights(day_count: int, preferences: list[str]) -> list[float]:
-    """让美食偏好的用户在部分天数获得更高餐饮预算。"""
-    foodie_bonus = 0.12 if "美食" in preferences else 0.0
+    """Give users with a food preference a higher dining budget on some days."""
+    foodie_bonus = 0.12 if "Food" in preferences else 0.0
     return [
         1.0 + foodie_bonus + (0.08 if index == day_count // 2 else 0.0) + ((index % 3) * 0.04)
         for index in range(day_count)
@@ -148,8 +148,8 @@ def _build_meal_weights(day_count: int, preferences: list[str]) -> list[float]:
 
 
 def _build_transport_weights(day_count: int, pace: str | None) -> list[float]:
-    """让交通预算随行程节奏和首尾日轻微浮动。"""
-    pace_bonus = 0.12 if pace == "紧凑" else -0.04 if pace == "轻松" else 0.04
+    """Nudge the transport budget based on trip pace and the first/last day."""
+    pace_bonus = 0.12 if pace == "Packed" else -0.04 if pace == "Relaxed" else 0.04
     return [
         1.0 + pace_bonus + (0.16 if index in (0, day_count - 1) else 0.0) + (index * 0.03)
         for index in range(day_count)
@@ -157,21 +157,21 @@ def _build_transport_weights(day_count: int, pace: str | None) -> list[float]:
 
 
 def _apply_route_based_transport_costs(itinerary: Itinerary) -> None:
-    """在已有路线距离时，用路线信息修正交通花费和耗时。"""
+    """When route distances are available, use them to refine transport cost and duration."""
     for day in itinerary.days:
         for transport in day.transport:
             if transport.estimated_minutes is not None:
-                transport.duration = f"{transport.estimated_minutes} 分钟"
+                transport.duration = f"{transport.estimated_minutes} min"
 
             if transport.distance_km is None:
                 continue
 
             mode = transport.mode or ""
-            if "公交" in mode:
+            if "bus" in mode.lower() or "transit" in mode.lower():
                 cost = max(2.0, 2.0 + (transport.distance_km * 0.25))
-            elif "步行" in mode:
+            elif "walk" in mode.lower():
                 cost = 0.0
-            elif "包车" in mode:
+            elif "charter" in mode.lower() or "private car" in mode.lower():
                 cost = 30.0 + (transport.distance_km * 3.8)
             else:
                 cost = 10.0 + (transport.distance_km * 2.2)
@@ -180,7 +180,7 @@ def _apply_route_based_transport_costs(itinerary: Itinerary) -> None:
 
 
 def _refresh_budget_breakdown(itinerary: Itinerary, request_budget: float | None = None) -> Itinerary:
-    """从具体条目回算预算汇总，避免预算明细显得过于模板化。"""
+    """Recompute the budget summary from individual line items, so it doesn't look too templated."""
     _apply_route_based_transport_costs(itinerary)
 
     transport_total = round(
@@ -224,7 +224,7 @@ def _maybe_enrich_itinerary_with_map_data(
     city: str | None = None,
     request_budget: float | None = None,
 ) -> Itinerary:
-    """按开关补充地图信息，并在最后统一刷新预算。"""
+    """Optionally enrich with map data based on a feature flag, then refresh the budget summary."""
     if ENABLE_AMAP_ENRICHMENT:
         try:
             itinerary = enrich_itinerary_with_map_data(itinerary, city=city)
@@ -235,7 +235,7 @@ def _maybe_enrich_itinerary_with_map_data(
 
 
 def generate_trip_itinerary(request: TripRequest) -> Itinerary:
-    """生成完整 itinerary，并使用更真实的预算估算方式。"""
+    """Generate a complete itinerary using a more realistic budget-estimation approach."""
     day_count = (request.end_date - request.start_date).days + 1
     day_count = max(day_count, 1)
 
@@ -295,22 +295,22 @@ def generate_trip_itinerary(request: TripRequest) -> Itinerary:
             llm_day = next((item for item in llm_draft.days if item.day_index == day_number), None)
 
         spot_name = llm_day.spot_name if llm_day is not None else fallback_spot_names[index]
-        theme = llm_day.theme if llm_day is not None else f"{request.destination} 第 {day_number} 天轻松游"
+        theme = llm_day.theme if llm_day is not None else f"{request.destination} Day {day_number} — relaxed sightseeing"
         spot_description = (
             llm_day.spot_description
             if llm_day is not None
-            else "根据本地攻略和旅行偏好安排，适合用半天时间慢慢游览。"
+            else "Arranged based on the local guide and travel preferences — a relaxed half-day visit."
         )
-        meal_name = llm_day.meal_name if llm_day is not None else f"{request.destination} 特色餐饮 {day_number}"
+        meal_name = llm_day.meal_name if llm_day is not None else f"{request.destination} local specialty meal {day_number}"
         meal_note = (
             llm_day.meal_notes
             if llm_day is not None
-            else "根据用户偏好和本地攻略预留的一条餐饮建议。"
+            else "A dining suggestion reserved based on your preferences and the local guide."
         )
         daily_note = (
             llm_day.daily_note
             if llm_day is not None
-            else "今天以轻松游览为主，建议根据体力和天气灵活调整停留时间。"
+            else "Today is mostly relaxed sightseeing — adjust how long you linger based on your energy and the weather."
         )
         ticket_cost = _estimate_ticket_cost(spot_name, spot_description)
 
@@ -331,22 +331,22 @@ def generate_trip_itinerary(request: TripRequest) -> Itinerary:
 
     ticket_total = round(sum(ticket_costs), 2)
     target_total = request.budget * (
-        0.78 if request.pace == "轻松" else 0.92 if request.pace == "紧凑" else 0.85
+        0.78 if request.pace == "Relaxed" else 0.92 if request.pace == "Packed" else 0.85
     )
     other_budget = round(request.budget * (0.05 + min(day_count, 4) * 0.01), 2)
     allocatable_budget = max(target_total - ticket_total - other_budget, request.budget * 0.45)
 
-    hotel_level = request.hotel_level or "舒适型"
-    if "豪华" in hotel_level:
+    hotel_level = request.hotel_level or "Comfort"
+    if "Luxury" in hotel_level:
         hotel_ratio = 0.62
-    elif "高档" in hotel_level or "高端" in hotel_level:
+    elif "Upscale" in hotel_level or "Premium" in hotel_level:
         hotel_ratio = 0.56
-    elif "经济" in hotel_level:
+    elif "Budget" in hotel_level:
         hotel_ratio = 0.40
     else:
         hotel_ratio = 0.50
 
-    meal_ratio = 0.28 if "美食" in request.preferences else 0.22
+    meal_ratio = 0.28 if "Food" in request.preferences else 0.22
     transport_ratio = max(0.12, 1 - hotel_ratio - meal_ratio)
     ratio_sum = hotel_ratio + meal_ratio + transport_ratio
 
@@ -387,34 +387,34 @@ def generate_trip_itinerary(request: TripRequest) -> Itinerary:
             meals=[
                 MealItem(
                     name=str(raw_day["meal_name"]),
-                    meal_type="午餐",
+                    meal_type="lunch",
                     estimated_cost=daily_meal_costs[index],
                     notes=str(raw_day["meal_note"]),
                 )
             ],
             hotel=HotelItem(
-                name=f"{request.destination} {hotel_level}住宿 {index + 1}",
+                name=f"{request.destination} {hotel_level} stay {index + 1}",
                 level=hotel_level,
                 estimated_cost=daily_hotel_costs[index],
-                location=f"{request.destination} 市区",
+                location=f"{request.destination} city center",
             ),
             transport=[
                 TransportItem(
-                    mode="打车",
-                    from_place=f"{request.destination} 出发点",
+                    mode="Taxi",
+                    from_place=f"{request.destination} starting point",
                     to_place=spot_name,
                     estimated_cost=daily_transport_costs[index],
-                    duration="30 分钟",
+                    duration="30 min",
                 )
             ],
             notes=[
-                f"当前旅行节奏：{request.pace or '适中'}",
+                f"Current travel pace: {request.pace or 'Moderate'}",
                 str(raw_day["daily_note"]),
             ],
         )
         days.append(day_plan)
 
-    preference_text = "、".join(request.preferences) if request.preferences else "常规旅行体验"
+    preference_text = ", ".join(request.preferences) if request.preferences else "a general travel experience"
     source_notes = [
         "Itinerary is assembled by trip_service.py and can optionally use LangChain structured output.",
     ]
@@ -424,18 +424,18 @@ def generate_trip_itinerary(request: TripRequest) -> Itinerary:
         llm_draft.tips
         if llm_draft is not None and llm_draft.tips
         else [
-            f"建议根据{request.destination}当天实时天气准备雨具或薄外套。",
-            "古镇、生态廊道和石板路更适合慢慢走，鞋子尽量选择舒适防滑的款式。",
+            f"Check the day-of forecast for {request.destination} and pack rain gear or a light jacket.",
+            "Old towns, eco-corridors, and cobblestone streets are best explored at a slow pace — wear comfortable, non-slip shoes.",
         ]
     )
-    if any("骑行" in context for context in rag_contexts):
-        tips.append("本地攻略提到洱海生态廊道适合骑行，可作为第二天或第三天备选。")
+    if any("cycl" in context.lower() for context in rag_contexts):
+        tips.append("The local guide notes the Erhai Lake eco-corridor is great for cycling — consider it for day two or three.")
     tips = _clean_user_tips(tips, request.destination)
 
     summary = (
         llm_draft.summary
         if llm_draft is not None
-        else f"这是一份为 {request.destination} 生成的 {day_count} 日行程，偏好重点为：{preference_text}。"
+        else f"This is a {day_count}-day itinerary generated for {request.destination}, focused on: {preference_text}."
     )
 
     itinerary = Itinerary(
@@ -457,7 +457,7 @@ def generate_trip_itinerary(request: TripRequest) -> Itinerary:
 
 
 def edit_trip_itinerary(request: TripEditRequest) -> Itinerary:
-    """优先使用 LLM 编辑单日行程，失败时回退到规则编辑。"""
+    """Prefer editing the target day via the LLM; fall back to rule-based editing if that fails."""
     updated_itinerary = request.current_itinerary.model_copy(deep=True)
 
     target_day = updated_itinerary.days[0] if updated_itinerary.days else None
@@ -501,13 +501,13 @@ def edit_trip_itinerary(request: TripEditRequest) -> Itinerary:
 
             llm_edit_applied = True
         else:
-            if "轻松" in request.user_instruction:
-                target_day.theme = f"{target_day.theme}（已调整为更轻松）"
-                target_day.notes.append("已根据用户要求把节奏调整得更轻松。")
+            if "relaxed" in request.user_instruction.lower():
+                target_day.theme = f"{target_day.theme} (adjusted to be more relaxed)"
+                target_day.notes.append("The pace has been made more relaxed per your request.")
 
-            if "不要安排" in request.user_instruction and target_day.spots:
-                target_day.spots[0].name = "自由活动 / 弹性安排"
-                target_day.spots[0].description = "根据用户要求，减少固定景点安排，保留更多自由活动时间。"
+            if "don't schedule" in request.user_instruction.lower() and target_day.spots:
+                target_day.spots[0].name = "Free time / flexible schedule"
+                target_day.spots[0].description = "Fixed attractions have been reduced per your request, leaving more free time."
                 target_day.spots[0].estimated_cost = 0.0
                 target_day.spots[0].address = None
                 target_day.spots[0].latitude = None
@@ -515,13 +515,13 @@ def edit_trip_itinerary(request: TripEditRequest) -> Itinerary:
                 target_day.spots[0].poi_id = None
 
     updated_itinerary.source_notes.append(
-        f"已根据用户编辑指令更新行程：{request.user_instruction}"
+        f"Itinerary updated per your edit instruction: {request.user_instruction}"
     )
     updated_itinerary.tips = _clean_user_tips(
         updated_itinerary.tips,
         updated_itinerary.destination,
     )
-    updated_itinerary.tips.append("已根据你的修改要求更新目标日期，出发前建议再确认当天交通、天气和景点开放情况。")
+    updated_itinerary.tips.append("The target day has been updated per your edit request — before you leave, double-check that day's transport, weather, and attraction opening hours.")
 
     updated_itinerary.token_usage = TokenUsage(
         rewrite_prompt_tokens=0,

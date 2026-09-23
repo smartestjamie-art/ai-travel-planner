@@ -11,17 +11,22 @@ const emit = defineEmits<{
 }>();
 
 const preferenceOptions = [
-  "自然风景",
-  "拍照",
-  "美食",
-  "古镇",
-  "休闲",
+  "Nature & Scenery",
+  "Photography",
+  "Food",
+  "Old Towns",
+  "Relaxation",
 ];
 
 const dietaryOptions = [
-  "少辣",
-  "不吃香菜",
-  "不吃葱",
+  "Vegetarian",
+  "Vegan",
+  "Halal",
+  "No Seafood",
+  "No Pork",
+  "Less Spicy",
+  "No Cilantro",
+  "Nut Allergy",
 ];
 
 function formatDate(date: Date): string {
@@ -36,16 +41,16 @@ const todayPlus2 = new Date(today);
 todayPlus2.setDate(todayPlus2.getDate() + 2);
 
 const formState = reactive({
-  destination: "大理",
+  destination: "Dali",
   startDate: formatDate(today),
   endDate: formatDate(todayPlus2),
   travelers: 2,
   budget: 3200,
-  hotelLevel: "舒适型",
-  pace: "轻松",
-  preferences: ["自然风景", "拍照", "美食"],
-  dietaryPreferences: ["少辣"],
-  notes: "不想太早起床，希望安排一个适合看日落的地点。",
+  hotelLevel: "Comfort",
+  pace: "Relaxed",
+  preferences: ["Nature & Scenery", "Photography", "Food"],
+  dietaryPreferences: [],
+  notes: "Would rather not get up too early, and would like a spot for watching the sunset.",
 });
 
 const isSubmitting = ref(false);
@@ -74,20 +79,20 @@ async function handleSubmit() {
   isSubmitting.value = true;
   try {
     const itinerary = await generateTrip(payload);
-    message.success("行程生成成功，已切换到结果页。");
+    message.success("Itinerary generated successfully. Switching to the results page.");
     emit("generated", itinerary);
   } catch (error) {
     console.error(error);
     if (axios.isAxiosError(error)) {
       if (error.code === "ECONNABORTED") {
-        message.error("行程生成超时，模型返回较慢，请稍后再试。");
+        message.error("Itinerary generation timed out; the model is responding slowly. Please try again later.");
       } else if (error.response) {
-        message.error(`行程生成失败：后端返回 ${error.response.status}。`);
+        message.error(`Failed to generate itinerary: backend returned ${error.response.status}.`);
       } else {
-        message.error("行程生成失败，请检查前端到后端的连接。");
+        message.error("Failed to generate itinerary. Please check the connection between frontend and backend.");
       }
     } else {
-      message.error("行程生成失败，请检查后端地址或服务状态。");
+      message.error("Failed to generate itinerary. Please check the backend address or service status.");
     }
   } finally {
     isSubmitting.value = false;
@@ -100,29 +105,29 @@ async function handleSubmit() {
     <div class="planner-card">
       <div class="section-title">
         <span class="section-title__icon">📍</span>
-        <span>目的地与日期</span>
+        <span>Destination & Dates</span>
       </div>
 
       <a-row :gutter="[16, 16]">
         <a-col :xs="24" :md="8">
-          <label class="field-label">目的地城市</label>
-          <a-input v-model:value="formState.destination" placeholder="请输入目的地" />
+          <label class="field-label">Destination City</label>
+          <a-input v-model:value="formState.destination" placeholder="Enter a destination" />
         </a-col>
         <a-col :xs="24" :md="5">
-          <label class="field-label">开始日期</label>
+          <label class="field-label">Start Date</label>
           <a-input v-model:value="formState.startDate" />
         </a-col>
         <a-col :xs="24" :md="5">
-          <label class="field-label">结束日期</label>
+          <label class="field-label">End Date</label>
           <a-input v-model:value="formState.endDate" />
         </a-col>
         <a-col :xs="12" :md="3">
-          <label class="field-label">人数</label>
+          <label class="field-label">Travelers</label>
           <a-input-number v-model:value="formState.travelers" :min="1" style="width: 100%" />
         </a-col>
         <a-col :xs="12" :md="3">
-          <label class="field-label">旅行天数</label>
-          <div class="pill-box">{{ dayCount }} 天</div>
+          <label class="field-label">Trip Length</label>
+          <div class="pill-box">{{ dayCount }} days</div>
         </a-col>
       </a-row>
     </div>
@@ -130,45 +135,45 @@ async function handleSubmit() {
     <div class="planner-card">
       <div class="section-title">
         <span class="section-title__icon">⚙️</span>
-        <span>偏好设置</span>
+        <span>Preferences</span>
       </div>
 
       <a-row :gutter="[16, 16]">
         <a-col :xs="24" :md="8">
-          <label class="field-label">节奏偏好</label>
+          <label class="field-label">Pace Preference</label>
           <a-select
             v-model:value="formState.pace"
             :options="[
-              { label: '轻松', value: '轻松' },
-              { label: '适中', value: '适中' },
-              { label: '紧凑', value: '紧凑' }
+              { label: 'Relaxed', value: 'Relaxed' },
+              { label: 'Moderate', value: 'Moderate' },
+              { label: 'Packed', value: 'Packed' }
             ]"
           />
         </a-col>
         <a-col :xs="24" :md="8">
-          <label class="field-label">住宿偏好</label>
+          <label class="field-label">Accommodation Preference</label>
           <a-select
             v-model:value="formState.hotelLevel"
             :options="[
-              { label: '舒适型', value: '舒适型' },
-              { label: '高档型', value: '高档型' },
-              { label: '经济型', value: '经济型' }
+              { label: 'Comfort', value: 'Comfort' },
+              { label: 'Upscale', value: 'Upscale' },
+              { label: 'Budget', value: 'Budget' }
             ]"
           />
         </a-col>
         <a-col :xs="24" :md="8">
-          <label class="field-label">预算</label>
+          <label class="field-label">Budget</label>
           <a-input-number v-model:value="formState.budget" :min="0" style="width: 100%" />
         </a-col>
       </a-row>
 
       <div class="checkbox-area">
-        <label class="field-label">旅行偏好</label>
+        <label class="field-label">Travel Preferences</label>
         <a-checkbox-group v-model:value="formState.preferences" :options="preferenceOptions" />
       </div>
 
       <div class="checkbox-area">
-        <label class="field-label">饮食偏好</label>
+        <label class="field-label">Dietary Preferences</label>
         <a-checkbox-group
           v-model:value="formState.dietaryPreferences"
           :options="dietaryOptions"
@@ -179,12 +184,12 @@ async function handleSubmit() {
     <div class="planner-card">
       <div class="section-title">
         <span class="section-title__icon">💬</span>
-        <span>额外要求</span>
+        <span>Additional Requests</span>
       </div>
       <a-textarea
         v-model:value="formState.notes"
         :rows="4"
-        placeholder="输入想要保留的偏好、节奏和备注"
+        placeholder="Enter any preferences, pace, or notes you'd like kept in mind"
       />
     </div>
 
@@ -194,10 +199,10 @@ async function handleSubmit() {
         :disabled="isSubmitting"
         @click="handleSubmit"
       >
-        {{ isSubmitting ? "正在生成中..." : "开始规划" }}
+        {{ isSubmitting ? "Generating..." : "Start Planning" }}
       </button>
       <div class="submit-panel__status">
-        当前已接上 `/trip/generate`，生成成功后会直接展示真实 itinerary。
+        Currently connected to `/trip/generate`; once generation succeeds, the real itinerary will be shown directly.
       </div>
     </div>
   </section>
@@ -211,10 +216,10 @@ async function handleSubmit() {
 
 .planner-card {
   padding: 24px;
-  border-radius: 24px;
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 22px 55px rgba(98, 116, 164, 0.12);
-  backdrop-filter: blur(14px);
+  border-radius: 20px;
+  background: rgba(255, 252, 246, 0.96);
+  box-shadow: 0 12px 40px rgba(100, 76, 50, 0.09);
+  border: 1px solid rgba(180, 155, 110, 0.15);
 }
 
 .section-title {
@@ -223,10 +228,11 @@ async function handleSubmit() {
   gap: 10px;
   margin-bottom: 18px;
   padding-bottom: 14px;
-  border-bottom: 1px solid rgba(106, 116, 215, 0.18);
-  color: #394867;
+  border-bottom: 1px solid rgba(140, 110, 70, 0.18);
+  color: #3d3328;
   font-size: 16px;
   font-weight: 700;
+  font-family: "Georgia", serif;
 }
 
 .section-title__icon {
@@ -236,9 +242,10 @@ async function handleSubmit() {
 .field-label {
   display: block;
   margin-bottom: 8px;
-  color: #667085;
+  color: #7c6f5e;
   font-size: 13px;
   font-weight: 600;
+  font-family: "Segoe UI", sans-serif;
 }
 
 .pill-box {
@@ -247,13 +254,50 @@ async function handleSubmit() {
   justify-content: center;
   min-height: 32px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #7386e0 0%, #8f71d8 100%);
-  color: #ffffff;
+  background: linear-gradient(135deg, #5a7a40 0%, #6e8f52 100%);
+  color: #f5f0e4;
   font-weight: 700;
+  font-family: "Segoe UI", sans-serif;
 }
 
 .checkbox-area {
   margin-top: 18px;
+}
+
+:deep(.ant-checkbox-group) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+:deep(.ant-checkbox-wrapper) {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(140, 110, 70, 0.22);
+  background: #faf5ec;
+  color: #5a4a36;
+  font-size: 13px;
+  font-family: "Segoe UI", sans-serif;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin: 0 !important;
+}
+
+:deep(.ant-checkbox-wrapper:hover) {
+  border-color: rgba(90, 120, 60, 0.4);
+  background: rgba(90, 120, 60, 0.07);
+}
+
+:deep(.ant-checkbox-wrapper.ant-checkbox-wrapper-checked) {
+  background: #4a6b30;
+  border-color: #4a6b30;
+  color: #f5f0e4;
+}
+
+:deep(.ant-checkbox) {
+  display: none;
 }
 
 .submit-panel {
@@ -265,23 +309,27 @@ async function handleSubmit() {
   min-width: 220px;
   border: none;
   border-radius: 999px;
-  padding: 14px 28px;
-  background: linear-gradient(135deg, #7d8ff0 0%, #a57fd8 100%);
-  color: #ffffff;
+  padding: 14px 32px;
+  background: linear-gradient(135deg, #b86b3a 0%, #c98248 100%);
+  color: #fffaf2;
   font-size: 15px;
   font-weight: 700;
+  font-family: "Segoe UI", sans-serif;
   cursor: pointer;
-  box-shadow: 0 18px 35px rgba(120, 129, 225, 0.25);
+  box-shadow: 0 16px 32px rgba(160, 90, 40, 0.22);
+  letter-spacing: 0.02em;
+  transition: opacity 0.2s;
 }
 
 .submit-panel__button:disabled {
-  opacity: 0.7;
+  opacity: 0.65;
   cursor: wait;
 }
 
 .submit-panel__status {
   margin-top: 12px;
-  color: #6b7280;
+  color: #9c8c7a;
   font-size: 13px;
+  font-family: "Segoe UI", sans-serif;
 }
 </style>

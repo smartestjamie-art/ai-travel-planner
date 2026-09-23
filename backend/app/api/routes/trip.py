@@ -24,31 +24,31 @@ router = APIRouter(prefix="/trip", tags=["trip"])
 
 @router.get("", response_model=TripListResponse)
 def list_trips() -> TripListResponse:
-    """返回已保存行程的摘要列表。"""
+    """Return a summary list of saved trips."""
     return list_saved_itineraries()
 
 
 @router.post("/generate", response_model=Itinerary)
 def generate_trip(request: TripRequest) -> Itinerary:
-    """生成结构化 itinerary。"""
+    """Generate a structured itinerary."""
     return generate_trip_itinerary(request)
 
 
 @router.get("/stats", response_model=TokenStatsResponse)
 def get_trip_token_stats() -> TokenStatsResponse:
-    """返回所有已保存行程的 token 消耗统计。"""
+    """Return token consumption statistics for all saved trips."""
     return get_token_stats()
 
 
 @router.post("/edit", response_model=Itinerary)
 def edit_trip(request: TripEditRequest) -> Itinerary:
-    """根据用户编辑指令返回更新后的 itinerary。"""
+    """Return the updated itinerary based on the user's edit instructions."""
     return edit_trip_itinerary(request)
 
 
 @router.post("/save")
 def save_trip(request: TripSaveRequest) -> dict[str, str]:
-    """保存 itinerary，并返回 trip_id。"""
+    """Save the itinerary and return its trip_id."""
     saved_trip_id = save_itinerary(request.itinerary)
     return {
         "message": "Trip itinerary saved successfully.",
@@ -58,7 +58,7 @@ def save_trip(request: TripSaveRequest) -> dict[str, str]:
 
 @router.get("/{trip_id}", response_model=TripDetailResponse)
 def get_trip_detail(trip_id: str) -> TripDetailResponse:
-    """根据 trip_id 查询已保存 itinerary。"""
+    """Look up a saved itinerary by trip_id."""
     trip_detail = get_itinerary_by_trip_id(trip_id)
     if trip_detail is None:
         raise HTTPException(status_code=404, detail="Trip not found.")
@@ -67,7 +67,7 @@ def get_trip_detail(trip_id: str) -> TripDetailResponse:
 
 @router.delete("/{trip_id}")
 def delete_trip(trip_id: str) -> dict[str, str]:
-    """根据 trip_id 删除已保存 itinerary。"""
+    """Delete a saved itinerary by trip_id."""
     deleted = delete_itinerary_by_trip_id(trip_id)
     if not deleted:
         raise HTTPException(status_code=404, detail="Trip not found.")

@@ -2,7 +2,7 @@ from pathlib import Path
 import sys
 
 
-# 允许测试文件直接导入 backend/app 下的模块。
+# Allow test files to import modules under backend/app directly.
 CURRENT_FILE = Path(__file__).resolve()
 BACKEND_DIR = CURRENT_FILE.parent.parent
 if str(BACKEND_DIR) not in sys.path:
@@ -14,36 +14,36 @@ import app.services.trip_service as trip_service  # noqa: E402
 
 
 '''
-给一个 TripRequest，service 会不会正确返回 Itinerary。
+Given a TripRequest, does the service correctly return an Itinerary?
 
-测试内容：
-    能接收 TripRequest
-    能返回结构正确的 Itinerary
-    能根据日期和偏好生成合理的演示结果
+What this tests:
+    Can accept a TripRequest
+    Returns a correctly structured Itinerary
+    Generates a reasonable demo result based on dates and preferences
 '''
 def build_trip_request() -> TripRequest:
-    """构造一个合法的 TripRequest，供 service 测试复用。"""
+    """Build a valid TripRequest for reuse across service tests."""
     return TripRequest(
-        destination="大理",
+        destination="Dali",
         start_date="2026-04-10",
         end_date="2026-04-12",
         travelers=2,
         budget=3200,
-        preferences=["自然风景", "拍照", "美食"],
-        pace="轻松",
-        dietary_preferences=["少辣"],
-        hotel_level="舒适型",
-        special_notes="不想太早起床，希望安排一个适合看日落的地点",
+        preferences=["Nature & Scenery", "Photography", "Food"],
+        pace="Relaxed",
+        dietary_preferences=["Less Spicy"],
+        hotel_level="Comfort",
+        special_notes="Don't want to get up too early — would like a spot good for watching the sunset",
     )
 
 
 def test_generate_trip_itinerary_returns_itinerary_object() -> None:
-    """测试 service 能返回一个结构完整的 itinerary。"""
+    """Test that the service returns a fully structured itinerary."""
     request = build_trip_request()
 
     itinerary = generate_trip_itinerary(request)
 
-    assert itinerary.destination == "大理"
+    assert itinerary.destination == "Dali"
     assert itinerary.trip_id.startswith("trip_")
     assert itinerary.summary != ""
     assert len(itinerary.days) == 3
@@ -51,7 +51,7 @@ def test_generate_trip_itinerary_returns_itinerary_object() -> None:
 
 
 def test_generate_trip_itinerary_builds_day_plans_by_date_range() -> None:
-    """测试 service 会根据日期范围生成对应天数的 DayPlan。"""
+    """Test that the service generates a matching number of DayPlans based on the date range."""
     request = build_trip_request()
 
     itinerary = generate_trip_itinerary(request)
@@ -63,69 +63,69 @@ def test_generate_trip_itinerary_builds_day_plans_by_date_range() -> None:
 
 
 def test_generate_trip_itinerary_keeps_request_preferences_in_summary() -> None:
-    """测试用户偏好会被写入返回摘要中。"""
+    """Test that the user's preferences are written into the returned summary."""
     request = build_trip_request()
 
     itinerary = generate_trip_itinerary(request)
 
-    assert "自然风景" in itinerary.summary
-    assert "拍照" in itinerary.summary
-    assert "美食" in itinerary.summary
+    assert "Nature & Scenery" in itinerary.summary
+    assert "Photography" in itinerary.summary
+    assert "Food" in itinerary.summary
 
 '''
-测的是：
-    service 能不能基于旧 Itinerary 做修改
-    edit_scope="day_2" 是否真的改到第二天
-    用户指令是否真的影响结果
+What this tests:
+    Whether the service can modify an existing Itinerary
+    Whether edit_scope="day_2" really edits the second day
+    Whether the user's instruction really affects the result
 '''
 def test_edit_trip_itinerary_updates_target_day_theme(monkeypatch) -> None:
-    """测试编辑逻辑可以修改指定天数的主题与备注。"""
+    """Test that the edit logic can update the theme and notes for the target day."""
     monkeypatch.setattr(trip_service, "generate_day_edit_draft", lambda request, target_day: (None, {"prompt_tokens": 0, "completion_tokens": 0}))
     original_itinerary = generate_trip_itinerary(build_trip_request())
 
     edit_request = TripEditRequest(
         trip_id=original_itinerary.trip_id,
         current_itinerary=original_itinerary,
-        user_instruction="第二天改得更轻松一点",
+        user_instruction="Make day two more relaxed",
         edit_scope="day_2",
-        preserve_constraints=["保留预算结构"],
+        preserve_constraints=["Preserve the budget structure"],
     )
 
     updated_itinerary = edit_trip_itinerary(edit_request)
 
-    assert updated_itinerary.days[1].theme.endswith("（已调整为更轻松）")
-    assert "已根据用户要求把节奏调整得更轻松。" in updated_itinerary.days[1].notes
+    assert updated_itinerary.days[1].theme.endswith("(adjusted to be more relaxed)")
+    assert "The pace has been made more relaxed per your request." in updated_itinerary.days[1].notes
 
 
 def test_edit_trip_itinerary_can_replace_first_spot_with_free_time(monkeypatch) -> None:
-    “””测试”不要安排”指令会把景点调整成自由活动。”””
-    monkeypatch.setattr(trip_service, “generate_day_edit_draft”, lambda request, target_day: (None, {“prompt_tokens”: 0, “completion_tokens”: 0}))
+    """Test that a "don't schedule" instruction turns the attraction into free time."""
+    monkeypatch.setattr(trip_service, "generate_day_edit_draft", lambda request, target_day: (None, {"prompt_tokens": 0, "completion_tokens": 0}))
     original_itinerary = generate_trip_itinerary(build_trip_request())
 
     edit_request = TripEditRequest(
         trip_id=original_itinerary.trip_id,
         current_itinerary=original_itinerary,
-        user_instruction="第二天不要安排景点了",
+        user_instruction="Don't schedule any attractions for day two",
         edit_scope="day_2",
         preserve_constraints=[],
     )
 
     updated_itinerary = edit_trip_itinerary(edit_request)
 
-    assert updated_itinerary.days[1].spots[0].name == "自由活动 / 弹性安排"
-    assert "减少固定景点安排" in updated_itinerary.days[1].spots[0].description
+    assert updated_itinerary.days[1].spots[0].name == "Free time / flexible schedule"
+    assert "Fixed attractions have been reduced" in updated_itinerary.days[1].spots[0].description
 
 
 def test_edit_trip_itinerary_can_apply_llm_day_edit(monkeypatch) -> None:
-    """测试当 LLM 编辑草稿可用时，会优先重写目标日安排。"""
+    """Test that when an LLM edit draft is available, it takes priority in rewriting the target day."""
 
     class FakeDayEditDraft:
-        theme = "更轻松的洱海慢游"
-        spot_name = "双廊古镇"
-        spot_description = "更适合慢节奏看海和看日落。"
-        meal_name = "海景下午茶"
-        meal_notes = "少辣，轻松休息。"
-        daily_note = "下午再出发，去双廊慢慢看日落。"
+        theme = "A more relaxed, slow-paced day at Erhai Lake"
+        spot_name = "Shuanglang Old Town"
+        spot_description = "Better suited for a slow-paced view of the lake and the sunset."
+        meal_name = "Lakeview afternoon tea"
+        meal_notes = "Mild spice, relaxed pace."
+        daily_note = "Head out in the afternoon and go to Shuanglang for a slow sunset watch."
 
     monkeypatch.setattr(
         trip_service,
@@ -137,30 +137,30 @@ def test_edit_trip_itinerary_can_apply_llm_day_edit(monkeypatch) -> None:
     edit_request = TripEditRequest(
         trip_id=original_itinerary.trip_id,
         current_itinerary=original_itinerary,
-        user_instruction="第二天改得更轻松一点，不要安排太满",
+        user_instruction="Make day two more relaxed, don't overpack the schedule",
         edit_scope="day_2",
-        preserve_constraints=["保留预算结构"],
+        preserve_constraints=["Preserve the budget structure"],
     )
 
     updated_itinerary = edit_trip_itinerary(edit_request)
 
-    assert updated_itinerary.days[1].theme == "更轻松的洱海慢游"
-    assert updated_itinerary.days[1].spots[0].name == "双廊古镇"
-    assert updated_itinerary.days[1].meals[0].name == "海景下午茶"
-    assert updated_itinerary.days[1].notes[-1] == "下午再出发，去双廊慢慢看日落。"
+    assert updated_itinerary.days[1].theme == "A more relaxed, slow-paced day at Erhai Lake"
+    assert updated_itinerary.days[1].spots[0].name == "Shuanglang Old Town"
+    assert updated_itinerary.days[1].meals[0].name == "Lakeview afternoon tea"
+    assert updated_itinerary.days[1].notes[-1] == "Head out in the afternoon and go to Shuanglang for a slow sunset watch."
 
 def test_generate_trip_itinerary_includes_local_guide_context() -> None:
-    """测试生成结果已经开始包含本地攻略检索信息。"""
+    """Test that the generated result already includes local guide retrieval context."""
     itinerary = generate_trip_itinerary(build_trip_request())
 
     joined_notes = "\n".join(itinerary.source_notes)
     joined_spots = "\n".join(day.spots[0].name for day in itinerary.days if day.spots)
 
     assert len(itinerary.source_notes) >= 2
-    assert "大理" in joined_notes
+    assert "Dali" in joined_notes
     assert (
-        "大理古城" in joined_spots
-        or "喜洲古镇" in joined_spots
-        or "崇圣寺三塔" in joined_spots
-        or "洱海生态廊道" in joined_spots
+        "Dali Old Town" in joined_spots
+        or "Xizhou Ancient Town" in joined_spots
+        or "Three Pagodas of Chongsheng Temple" in joined_spots
+        or "Erhai Lake Eco-Corridor" in joined_spots
     )

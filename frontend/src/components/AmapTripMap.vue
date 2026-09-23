@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
 interface TripMapPoint {
   key: string;
@@ -95,7 +95,7 @@ function renderMarkers() {
 
     const imageHtml = point.imageUrl
       ? `<img src="${point.imageUrl}" alt="${point.name}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;" />`
-      : `<div style="width:100%;height:100%;display:grid;place-items:center;border-radius:8px;background:linear-gradient(135deg,#e8edff,#f0e8ff);color:#8b8fad;font-size:10px;">暂无图片</div>`;
+      : `<div style="width:100%;height:100%;display:grid;place-items:center;border-radius:8px;background:linear-gradient(135deg,#e8edff,#f0e8ff);color:#8b8fad;font-size:10px;">No image available</div>`;
 
     const bubble = new window.AMap.Marker({
       position,
@@ -137,7 +137,7 @@ function renderMarkers() {
       content: `
         <div style="max-width:240px;padding:4px 2px;line-height:1.7;">
           <strong>${point.name}</strong><br/>
-          <span>第${point.dayIndex}天 · ${point.theme}</span><br/>
+          <span>Day ${point.dayIndex} · ${point.theme}</span><br/>
           <span>${point.address}</span>
         </div>
       `,
@@ -193,10 +193,15 @@ function ensureMapScript(): Promise<void> {
 
     if (existingScript) {
       existingScript.addEventListener("load", () => resolve(), { once: true });
-      existingScript.addEventListener("error", () => reject(new Error("高德地图脚本加载失败。")), {
+      existingScript.addEventListener("error", () => reject(new Error("Failed to load the Amap script.")), {
         once: true,
       });
       return;
+    }
+
+    const securityCode = import.meta.env.VITE_AMAP_SECURITY_CODE;
+    if (securityCode) {
+      (window as any)._AMapSecurityConfig = { securityJsCode: securityCode };
     }
 
     const script = document.createElement("script");
@@ -205,14 +210,14 @@ function ensureMapScript(): Promise<void> {
     script.defer = true;
     script.dataset.amapLoader = "true";
     script.onload = () => resolve();
-    script.onerror = () => reject(new Error("高德地图脚本加载失败。"));
+    script.onerror = () => reject(new Error("Failed to load the Amap script."));
     document.head.appendChild(script);
   });
 }
 
 async function initMap() {
   if (!amapKey) {
-    loadError.value = "未配置前端高德 JavaScript Key。";
+    loadError.value = "The frontend Amap JavaScript key is not configured.";
     return;
   }
 
@@ -225,7 +230,7 @@ async function initMap() {
     await ensureMapScript();
 
     if (!window.AMap) {
-      loadError.value = "高德地图对象初始化失败。";
+      loadError.value = "Failed to initialize the Amap object.";
       return;
     }
 
@@ -234,12 +239,19 @@ async function initMap() {
       resizeEnable: true,
       viewMode: "2D",
       mapStyle: "amap://styles/whitesmoke",
+      animateEnable: false,
     });
+
+    // Right after the container mounts, the browser may not have finished layout
+    // measurement yet, so the map can get the wrong size and its coordinates end up
+    // offset. Wait one frame, then force a resize and reposition.
+    await nextTick();
+    mapInstance.value.resize();
 
     renderMarkers();
   } catch (error) {
     console.error(error);
-    loadError.value = "地图加载失败，请检查前端高德 Key 或网络环境。";
+    loadError.value = "Failed to load the map. Please check the frontend Amap key or your network connection.";
   }
 }
 
@@ -265,12 +277,12 @@ onBeforeUnmount(() => {
 <template>
   <div class="trip-map">
     <div v-if="loadError" class="trip-map__placeholder">
-      <strong>地图暂未启用</strong>
+      <strong>Map Not Available</strong>
       <span>{{ loadError }}</span>
     </div>
     <div v-else-if="validPoints.length === 0" class="trip-map__placeholder">
-      <strong>暂无可展示点位</strong>
-      <span>当前 itinerary 里还没有可用的经纬度数据。</span>
+      <strong>No Points to Display</strong>
+      <span>This itinerary doesn't have any usable coordinate data yet.</span>
     </div>
     <div v-else ref="mapContainer" class="trip-map__canvas"></div>
   </div>

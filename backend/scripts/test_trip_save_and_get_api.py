@@ -15,37 +15,37 @@ if str(BACKEND_DIR) not in sys.path:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    """构造命令行参数解析器。"""
+    """Build the command-line argument parser."""
     parser = argparse.ArgumentParser(
-        description="读取 generated_trip.json，并测试真实 /trip/save 和 /trip/{trip_id} 接口。"
+        description="Read generated_trip.json and test the real /trip/save and /trip/{trip_id} endpoints."
     )
     parser.add_argument(
         "--base-url",
         default="http://127.0.0.1:8000",
-        help="FastAPI 服务地址",
+        help="FastAPI service address",
     )
     parser.add_argument(
         "--input-file",
         default="generated_trip.json",
-        help="先前通过 /trip/generate 保存的 itinerary 文件",
+        help="Itinerary file previously saved via /trip/generate",
     )
     parser.add_argument(
         "--user-id",
         default="user_001",
-        help="保存时使用的用户 ID",
+        help="User ID to use when saving",
     )
     return parser
 
 
 def load_generated_trip(input_file: str) -> dict:
-    """读取 generated_trip.json。"""
+    """Read generated_trip.json."""
     file_path = Path(input_file)
     with file_path.open("r", encoding="utf-8") as file:
         return json.load(file)
 
 
 def post_json(url: str, payload: dict) -> dict:
-    """发送 JSON POST 请求并返回 JSON 响应。"""
+    """Send a JSON POST request and return the JSON response."""
     body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
     req = request.Request(
         url=url,
@@ -59,7 +59,7 @@ def post_json(url: str, payload: dict) -> dict:
 
 
 def get_json(url: str) -> dict:
-    """发送 GET 请求并返回 JSON 响应。"""
+    """Send a GET request and return the JSON response."""
     req = request.Request(url=url, method="GET")
     with request.urlopen(req) as response:
         response_text = response.read().decode("utf-8")
@@ -79,24 +79,24 @@ def main() -> int:
         "user_id": args.user_id,
     }
 
-    print("=== 保存请求 ===")
+    print("=== Save Request ===")
     print(json.dumps(save_payload, ensure_ascii=False, indent=2))
     print()
 
     save_response = post_json(f"{args.base_url}/trip/save", save_payload)
 
-    print("=== 保存响应 ===")
+    print("=== Save Response ===")
     print(json.dumps(save_response, ensure_ascii=False, indent=2))
     print()
 
     encoded_trip_id = quote(trip_id, safe="")
     get_response = get_json(f"{args.base_url}/trip/{encoded_trip_id}")
 
-    print("=== 查询响应 ===")
+    print("=== Query Response ===")
     print(json.dumps(get_response, ensure_ascii=False, indent=2))
     print()
 
-    print("=== 快速检查 ===")
+    print("=== Quick Check ===")
     print(f"saved_trip_id: {save_response.get('trip_id')}")
     print(f"queried_trip_id: {get_response.get('trip_id')}")
     itinerary_data = get_response.get("itinerary", {})

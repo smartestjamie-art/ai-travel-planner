@@ -32,14 +32,14 @@ function updateCurrentItinerary(itinerary: Itinerary) {
 
     <header class="hero">
       <div class="hero__badge">Trip Planner Demo</div>
-      <h1 class="hero__title">智能旅行助手</h1>
+      <h1 class="hero__title">Smart Travel Assistant</h1>
 
       <div class="hero__tabs">
         <button
           :class="['hero__tab', { 'hero__tab--active': currentView === 'home' }]"
           @click="currentView = 'home'"
         >
-          规划页
+          Plan
         </button>
         <button
           :class="[
@@ -50,13 +50,13 @@ function updateCurrentItinerary(itinerary: Itinerary) {
           :disabled="!latestItinerary"
           @click="currentView = 'result'"
         >
-          结果页
+          Result
         </button>
         <button
           :class="['hero__tab', { 'hero__tab--active': currentView === 'history' }]"
           @click="currentView = 'history'"
         >
-          历史列表
+          History
         </button>
       </div>
     </header>
@@ -86,12 +86,12 @@ function updateCurrentItinerary(itinerary: Itinerary) {
 :global(body) {
   margin: 0;
   min-width: 320px;
-  font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif;
+  font-family: "Georgia", "PingFang SC", "Microsoft YaHei", serif;
   background:
-    radial-gradient(circle at top left, rgba(175, 198, 255, 0.55), transparent 28%),
-    radial-gradient(circle at right 18%, rgba(181, 150, 255, 0.3), transparent 20%),
-    linear-gradient(180deg, #eef4ff 0%, #edf2f9 100%);
-  color: #1f2937;
+    radial-gradient(ellipse at top left, rgba(180, 155, 100, 0.18), transparent 40%),
+    radial-gradient(ellipse at bottom right, rgba(100, 140, 90, 0.14), transparent 40%),
+    linear-gradient(180deg, #f5f0e6 0%, #ede8db 100%);
+  color: #2d2a24;
 }
 
 :global(*) {
@@ -110,21 +110,21 @@ function updateCurrentItinerary(itinerary: Itinerary) {
   width: 320px;
   height: 320px;
   border-radius: 50%;
-  filter: blur(24px);
-  opacity: 0.5;
+  filter: blur(32px);
+  opacity: 0.4;
   pointer-events: none;
 }
 
 .app-shell__glow--left {
   top: -110px;
   left: -90px;
-  background: rgba(113, 132, 255, 0.45);
+  background: rgba(160, 120, 60, 0.35);
 }
 
 .app-shell__glow--right {
   right: -80px;
   bottom: 120px;
-  background: rgba(155, 116, 255, 0.25);
+  background: rgba(80, 120, 70, 0.25);
 }
 
 .hero {
@@ -138,21 +138,26 @@ function updateCurrentItinerary(itinerary: Itinerary) {
 .hero__badge {
   display: inline-flex;
   align-items: center;
-  padding: 8px 14px;
+  padding: 8px 16px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.72);
-  color: #5c6ac4;
+  background: rgba(255, 250, 240, 0.85);
+  color: #5a7a40;
   font-size: 13px;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  box-shadow: 0 12px 30px rgba(98, 116, 164, 0.1);
+  letter-spacing: 0.06em;
+  font-family: "Segoe UI", sans-serif;
+  box-shadow: 0 8px 24px rgba(80, 100, 60, 0.12);
 }
 
 .hero__title {
   margin: 18px 0 0;
-  color: #ffffff;
+  color: #f5f0e4;
   font-size: 48px;
   line-height: 1.1;
+  font-family: "Georgia", serif;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-shadow: 0 2px 12px rgba(30, 50, 20, 0.3);
 }
 
 .hero::before {
@@ -162,8 +167,8 @@ function updateCurrentItinerary(itinerary: Itinerary) {
   height: 220px;
   z-index: -1;
   border-radius: 36px;
-  background: linear-gradient(135deg, #6d82de 0%, #6f72d9 52%, #8c67cf 100%);
-  box-shadow: 0 32px 80px rgba(95, 110, 172, 0.3);
+  background: linear-gradient(135deg, #3a5c2a 0%, #4a6e38 50%, #5e8048 100%);
+  box-shadow: 0 32px 80px rgba(40, 70, 30, 0.28);
 }
 
 .hero__tabs {
@@ -172,28 +177,30 @@ function updateCurrentItinerary(itinerary: Itinerary) {
   margin-top: 24px;
   padding: 8px;
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.14);
   backdrop-filter: blur(10px);
 }
 
 .hero__tab {
   border: none;
   border-radius: 12px;
-  padding: 10px 18px;
+  padding: 10px 20px;
   background: transparent;
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(240, 235, 220, 0.9);
   font-size: 14px;
   font-weight: 600;
+  font-family: "Segoe UI", sans-serif;
   cursor: pointer;
+  transition: background 0.2s;
 }
 
 .hero__tab--active {
-  background: rgba(255, 255, 255, 0.92);
-  color: #5f60c8;
+  background: rgba(255, 250, 240, 0.92);
+  color: #4a6b30;
 }
 
 .hero__tab--disabled {
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: not-allowed;
 }
 
