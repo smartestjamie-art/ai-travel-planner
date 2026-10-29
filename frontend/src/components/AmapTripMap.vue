@@ -55,12 +55,9 @@ function clearOverlays() {
   }
 }
 
-function renderMarkers() {
-  if (!window.AMap || !mapInstance.value) {
-    return;
-  }
-
-  clearOverlays();
+function drawPoints(map: any): { overlays: any[]; line: any } {
+  const overlays: any[] = [];
+  let line: any = null;
 
   const sorted = [...validPoints.value].sort((a, b) => a.dayIndex - b.dayIndex);
   const bounds: [number, number][] = [];
@@ -144,17 +141,17 @@ function renderMarkers() {
     });
 
     marker.on("click", () => {
-      infoWindow.open(mapInstance.value, position);
+      infoWindow.open(map, position);
     });
 
-    mapInstance.value.add(marker);
-    mapInstance.value.add(bubble);
-    markerList.value.push(marker);
-    markerList.value.push(bubble);
+    map.add(marker);
+    map.add(bubble);
+    overlays.push(marker);
+    overlays.push(bubble);
   });
 
   if (routePath.length >= 2) {
-    routeLine.value = new window.AMap.Polyline({
+    line = new window.AMap.Polyline({
       path: routePath,
       strokeColor: "#6d82de",
       strokeWeight: 3,
@@ -170,13 +167,67 @@ function renderMarkers() {
       borderColor: "rgba(109,130,222,0.25)",
       zIndex: 50,
     });
-    mapInstance.value.add(routeLine.value);
+    map.add(line);
   }
 
   if (bounds.length === 1) {
-    mapInstance.value.setZoomAndCenter(13, bounds[0]);
+    map.setZoomAndCenter(13, bounds[0]);
   } else if (bounds.length > 1) {
-    mapInstance.value.setFitView(markerList.value, false, [60, 60, 60, 60]);
+    map.setFitView(overlays, false, [60, 60, 60, 60]);
+  }
+
+  return { overlays, line };
+}
+
+function renderMarkers() {
+  if (!window.AMap || !mapInstance.value) {
+    return;
+  }
+
+  clearOverlays();
+  const { overlays, line } = drawPoints(mapInstance.value);
+  markerList.value = overlays;
+  routeLine.value = line;
+}
+
+const MAP_STYLE = {
+  zoom: 11,
+  resizeEnable: true,
+  viewMode: "2D",
+  mapStyle: "amap://styles/whitesmoke",
+  animateEnable: false,
+};
+
+const zoomOpen = ref(false);
+const zoomContainer = ref<HTMLDivElement | null>(null);
+let zoomMap: any = null;
+
+async function openZoom() {
+  if (!window.AMap || zoomOpen.value) {
+    return;
+  }
+  zoomOpen.value = true;
+  await nextTick();
+  if (!zoomContainer.value) {
+    return;
+  }
+  zoomMap = new window.AMap.Map(zoomContainer.value, MAP_STYLE);
+  await nextTick();
+  zoomMap.resize();
+  drawPoints(zoomMap);
+}
+
+function closeZoom() {
+  zoomOpen.value = false;
+  if (zoomMap) {
+    zoomMap.destroy();
+    zoomMap = null;
+  }
+}
+
+function onKeydown(event: KeyboardEvent) {
+  if (event.key === "Escape" && zoomOpen.value) {
+    closeZoom();
   }
 }
 
@@ -234,13 +285,7 @@ async function initMap() {
       return;
     }
 
-    mapInstance.value = new window.AMap.Map(mapContainer.value, {
-      zoom: 11,
-      resizeEnable: true,
-      viewMode: "2D",
-      mapStyle: "amap://styles/whitesmoke",
-      animateEnable: false,
-    });
+    mapInstance.value = new window.AMap.Map(mapContainer.value, MAP_STYLE);
 
     // Right after the container mounts, the browser may not have finished layout
     // measurement yet, so the map can get the wrong size and its coordinates end up
@@ -257,15 +302,22 @@ async function initMap() {
 
 onMounted(() => {
   void initMap();
+  window.addEventListener("keydown", onKeydown);
 });
 
 watch(validPoints, () => {
   if (mapInstance.value) {
     renderMarkers();
   }
+  if (zoomMap) {
+    zoomMap.clearMap();
+    drawPoints(zoomMap);
+  }
 });
 
 onBeforeUnmount(() => {
+  window.removeEventListener("keydown", onKeydown);
+  closeZoom();
   clearOverlays();
   if (mapInstance.value) {
     mapInstance.value.destroy();
@@ -284,7 +336,36 @@ onBeforeUnmount(() => {
       <strong>No Points to Display</strong>
       <span>This itinerary doesn't have any usable coordinate data yet.</span>
     </div>
-    <div v-else ref="mapContainer" class="trip-map__canvas"></div>
+    <div v-else class="trip-map__stage">
+      <div ref="mapContainer" class="trip-map__canvas"></div>
+      <button
+        type="button"
+        class="trip-map__magnifier"
+        title="Enlarge map"
+        aria-label="Enlarge map"
+        @click="openZoom"
+      >
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <circle cx="10.5" cy="10.5" r="6.5" />
+          <line x1="15.5" y1="15.5" x2="21" y2="21" />
+          <line x1="10.5" y1="7.5" x2="10.5" y2="13.5" />
+          <line x1="7.5" y1="10.5" x2="13.5" y2="10.5" />
+        </svg>
+      </button>
+    </div>
+
+    <Teleport to="body">
+      <div v-if="zoomOpen" class="trip-map-zoom" @click.self="closeZoom">
+        <div class="trip-map-zoom__panel">
+          <div class="trip-map-zoom__bar">
+            <strong>Route map</strong>
+            <span>Scroll or pinch to zoom, drag to pan, Esc to close</span>
+            <button type="button" class="trip-map-zoom__close" aria-label="Close" @click="closeZoom">×</button>
+          </div>
+          <div ref="zoomContainer" class="trip-map-zoom__canvas"></div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
@@ -292,6 +373,35 @@ onBeforeUnmount(() => {
 .trip-map {
   height: calc(100% - 58px);
   min-height: 280px;
+}
+
+.trip-map__stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.trip-map__magnifier {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  color: #5b6bd6;
+  box-shadow: 0 2px 10px rgba(60, 70, 120, 0.25);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.trip-map__magnifier:hover {
+  transform: scale(1.08);
+  box-shadow: 0 4px 14px rgba(60, 70, 120, 0.35);
 }
 
 .trip-map__canvas,
@@ -314,6 +424,64 @@ onBeforeUnmount(() => {
     linear-gradient(45deg, rgba(255, 255, 255, 0.75), rgba(244, 247, 255, 0.9));
   color: #5b6474;
   text-align: center;
+}
+
+.trip-map-zoom {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(20, 24, 45, 0.55);
+  backdrop-filter: blur(3px);
+}
+
+.trip-map-zoom__panel {
+  display: flex;
+  flex-direction: column;
+  width: min(1200px, 100%);
+  height: min(800px, 100%);
+  overflow: hidden;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 20px 60px rgba(10, 15, 40, 0.45);
+}
+
+.trip-map-zoom__bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 18px;
+  color: #3b4256;
+  border-bottom: 1px solid #eceff6;
+}
+
+.trip-map-zoom__bar span {
+  flex: 1;
+  color: #8b93a7;
+  font-size: 13px;
+}
+
+.trip-map-zoom__close {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 50%;
+  background: #f1f3fa;
+  color: #5b6474;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.trip-map-zoom__close:hover {
+  background: #e4e8f6;
+}
+
+.trip-map-zoom__canvas {
+  flex: 1;
+  min-height: 0;
 }
 
 .trip-map__placeholder strong {
