@@ -23,7 +23,6 @@ const emit = defineEmits<{
 }>();
 
 const saving = ref(false);
-const saveName = ref("");
 const exportingPdf = ref(false);
 const exportingMarkdown = ref(false);
 const editing = ref(false);
@@ -185,13 +184,8 @@ function buildVisibleItinerary(): Itinerary | null {
     return null;
   }
 
-  // A typed name becomes the saved record's ID shown in History. Slashes are replaced
-  // because the ID is also used as a URL path segment for exports.
-  const customId = saveName.value.trim().replace(/[\\/]+/g, "-").slice(0, 100);
-
   return {
     ...props.itinerary,
-    trip_id: customId || props.itinerary.trip_id,
     tips: displayTips.value,
   };
 }
@@ -291,7 +285,7 @@ async function handleSave() {
   saving.value = true;
   try {
     await saveTrip(itineraryToSave);
-    message.success(`Saved as "${itineraryToSave.trip_id}". You can view it in the history list.`);
+    message.success("Itinerary saved. You can view it in the history list.");
   } catch (error) {
     console.error(error);
     message.error("Failed to save the itinerary.");
@@ -348,15 +342,6 @@ async function handleEdit() {
 
       <div class="sidebar-actions">
         <button class="back-button" @click="$emit('backHome')">Back to Planning</button>
-        <input
-          v-model="saveName"
-          class="save-name-input"
-          type="text"
-          maxlength="100"
-          placeholder="Name this record (optional)"
-          aria-label="Record name"
-          @keydown.enter="handleSave"
-        />
         <button class="save-button" :disabled="saving" @click="handleSave">
           {{ saving ? "Saving..." : "Save Itinerary" }}
         </button>
@@ -673,23 +658,6 @@ async function handleEdit() {
 .save-button {
   background: linear-gradient(135deg, #b86b3a 0%, #c98248 100%);
   color: #fffaf2;
-}
-
-.save-name-input {
-  width: 100%;
-  box-sizing: border-box;
-  border: 1px solid rgba(90, 70, 40, 0.25);
-  border-radius: 12px;
-  padding: 11px 14px;
-  background: rgba(255, 255, 255, 0.85);
-  color: #4a3a22;
-  font-size: 14px;
-}
-
-.save-name-input:focus {
-  outline: none;
-  border-color: #b86b3a;
-  box-shadow: 0 0 0 3px rgba(184, 107, 58, 0.18);
 }
 
 .save-button:disabled,
